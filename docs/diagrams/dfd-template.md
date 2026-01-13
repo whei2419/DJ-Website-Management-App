@@ -1,14 +1,12 @@
 # Data Flow Diagram — DJ & Voter Web App (Mermaid)
 
-Edit the placeholders below to match the app. This version reflects the DJ registration and voter verification flows you described.
-
 ```mermaid
 flowchart LR
   %% === External Entities ===
   DJ["DJ (registrant)\n(name, email, phone, profile pic, slot)"]
   Voter["Voter (enters phone number to vote)"]
   Admin[Admin]
-  ExternalVerify["External Verification API\n(fetches name & email by phone)"]
+  DigitalJourney["Digital Journey — External API\nfetches name & email by phone"]
 
   %% === Processes / Services ===
   WebApp["Web Application (Frontend)"]
@@ -30,8 +28,8 @@ flowchart LR
 
   Voter -->|enter phone, select DJ to vote| WebApp
   WebApp -->|POST /vote: phone dj_id| API
-  API -->|query external verify by phone| ExternalVerify
-  ExternalVerify -->|returns name email confirm identity| API
+  API -->|query Digital Journey by phone| DigitalJourney
+  DigitalJourney -->|returns name email confirm identity| API
   API -->|check prior vote for phone & dj_id| DB
   API -->|if allowed: write vote record| DB
   API -->|increment vote count| DB
