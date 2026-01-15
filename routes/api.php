@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DJController as AdminDJController;
+use App\Http\Controllers\Api\AdminDJController as ApiAdminDJController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,5 +22,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::middleware('auth:sanctum')->group(function () {
     // Admin DJs for AJAX - supports search & pagination (queried from JS)
-    Route::get('admin/djs/list', [AdminDJController::class, 'list'])->name('admin.djs.list');
+    // Use dedicated API controller for list endpoint
+    Route::get('admin/djs/list', [ApiAdminDJController::class, 'list'])->name('admin.djs.list');
 });

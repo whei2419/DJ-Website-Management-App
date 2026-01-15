@@ -5,6 +5,49 @@
 @section('content')
 
     <div class="page-wrapper">
+        <div class="modal" id="addEditDJModal" tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 id="DjTitle" class="modal-title"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addDJForm" action="" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                <input type="text" class="form-control" id="djName" name="name" required>
+                            </div>
+                            <small class="error-message"></small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="slot" class="form-label">Time Slot</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-clock"></i></span>
+                                <input type="text" class="form-control" id="djSlot" name="slot" required>
+                            </div>
+                            <small class="error-message"></small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="video" class="form-label">Video Preview</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-video"></i></span>
+                                <input type="file" class="form-control" id="djVideo" name="video" accept="video/*" required>
+                            </div>
+                            <small class="error-message"></small>
+                        </div>
+                        </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn me-auto" data-bs-dismiss="modal">Close</button>
+                    <button id="saveDJButton" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
         {{-- Content start here --}}
         <div class="container-xl">
             <div class="page-body">
@@ -37,7 +80,7 @@
                                                         <kbd>ctrl + K</kbd>
                                                     </span>
                                                 </div>
-                                                <a href="#" class="btn btn-primary btn-0"> Add Dj</a>
+                                                <a href="#" id="addOpen" class="btn btn-primary btn-0" data-bs-toggle="modal" data-bs-target="#addEditDJModal"> Add Dj</a>
                                             </div>
                                         </div>
                                     </div>
