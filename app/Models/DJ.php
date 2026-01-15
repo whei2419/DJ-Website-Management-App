@@ -8,4 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class DJ extends Model
 {
     use HasFactory;
+    
+    protected $fillable = [
+        'name',
+        'slot',
+        'video_url',
+    ];
 }
