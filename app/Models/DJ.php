@@ -11,7 +11,12 @@ class DJ extends Model
     
     protected $fillable = [
         'name',
-        'slot',
         'video_url',
+        'video_path',
     ];
+
+    public function dates()
+    {
+        return $this->hasMany(Date::class);
+    }
 }

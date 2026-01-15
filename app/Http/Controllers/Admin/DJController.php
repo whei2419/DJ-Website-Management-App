@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\DJ;
+use Illuminate\Support\Facades\Storage;
 
 class DJController extends Controller
 {
@@ -32,11 +33,22 @@ class DJController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'video_url' => 'required|url',
-            'slot' => 'required|string|max:255|unique:djs,slot',
+            'video' => 'nullable|file|mimetypes:video/mp4,video/quicktime,video/x-msvideo,video/x-ms-wmv,video/webm|max:200000',
         ]);
 
-        DJ::create($request->only(['name', 'video_url', 'slot']));
+        $data = $request->only(['name']);
+
+        if ($request->hasFile('video')) {
+            $file = $request->file('video');
+            $path = $file->store('djs', 'public');
+            $data['video_path'] = $path;
+        }
+
+        if ($request->filled('video_url')) {
+            $data['video_url'] = $request->input('video_url');
+        }
+
+        DJ::create($data);
 
         return redirect()->route('admin.djs.index')->with('success', 'DJ created successfully.');
     }
@@ -65,12 +77,33 @@ class DJController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'video_url' => 'required|url',
-            'slot' => 'required|string|max:255|unique:djs,slot,' . $id,
+            'video' => 'nullable|file|mimetypes:video/mp4,video/quicktime,video/x-msvideo,video/x-ms-wmv,video/webm|max:200000',
+            'slot' => 'nullable|string',
         ]);
 
         $dj = DJ::findOrFail($id);
-        $dj->update($request->only(['name', 'video_url', 'slot']));
+
+        $data = $request->only(['name']);
+
+        if ($request->filled('slot')) {
+            $data['slot'] = $request->input('slot');
+        }
+
+        if ($request->hasFile('video')) {
+            // delete previous file if exists
+            if ($dj->video_path && Storage::disk('public')->exists($dj->video_path)) {
+                Storage::disk('public')->delete($dj->video_path);
+            }
+            $file = $request->file('video');
+            $path = $file->store('djs', 'public');
+            $data['video_path'] = $path;
+        }
+
+        if ($request->filled('video_url')) {
+            $data['video_url'] = $request->input('video_url');
+        }
+
+        $dj->update($data);
 
         return redirect()->route('admin.djs.index')->with('success', 'DJ information updated successfully.');
     }

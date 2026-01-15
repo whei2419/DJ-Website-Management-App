@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\DJController as AdminDJController;
+use App\Http\Controllers\Admin\DateController as AdminDateController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -35,14 +36,21 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     
-    // Admin DJ resource routes
-    Route::resource('admin/djs', AdminDJController::class)->names([
+    // Admin DJ resource routes (omit separate create page — modal used)
+    Route::resource('admin/djs', AdminDJController::class)->except(['create'])->names([
         'index' => 'admin.djs.index',
-        'create' => 'admin.djs.create',
         'store' => 'admin.djs.store',
         'edit' => 'admin.djs.edit',
         'update' => 'admin.djs.update',
         'destroy' => 'admin.djs.destroy',
+    ]);
+
+    // Admin Date resource routes (omit show, create pages — modal used)
+    Route::resource('admin/dates', AdminDateController::class)->except(['show', 'create', 'edit'])->names([
+        'index' => 'admin.dates.index',
+        'store' => 'admin.dates.store',
+        'update' => 'admin.dates.update',
+        'destroy' => 'admin.dates.destroy',
     ]);
 });
 

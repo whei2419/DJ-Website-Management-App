@@ -1,0 +1,266 @@
+@extends('layouts.admin')
+
+@section('title','DJs')
+
+@section('content')
+    <div class="page-header d-print-none">
+        <div class="container">
+            <div class="row g-2 align-items-center">
+                <div class="col">
+                    <h2 class="page-title">DJs</h2>
+                    <div class="text-muted mt-1">Manage DJs — add, edit, or remove DJs</div>
+                </div>
+                <div class="col-auto ms-auto d-print-none">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createDJModal">
+                        <i class="fas fa-plus me-2"></i>Create DJ
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-body">
+        <div class="container">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-vcenter card-table">
+                            <thead>
+                                <tr>
+                                    <script>
+                                        (function(){
+                                            function pad(n){ return n<10? '0'+n : n; }
+                                            function formatDate(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+
+                                            // build takenSlots from server data
+                                            var takenSlots = [];
+                                            @if(isset($djs) && $djs->count())
+                                                @foreach($djs as $dj)
+                                                    @php $slots = json_decode($dj->slot, true) ?: []; @endphp
+                                                    @foreach($slots as $s)
+                                                        takenSlots.push({ date: '{{ $s['date'] }}', time: '{{ $s['time'] }}', owner: {!! json_encode($dj->name) !!} });
+                                                    @endforeach
+                                                @endforeach
+                                            @endif
+
+                                            var times = ['10:00','12:00','14:00','16:00','18:00','20:00'];
+                                            var list = document.getElementById('weekendDatesList');
+                                            var slotInput = document.getElementById('slotInput');
+                                            var form = document.getElementById('createDJForm');
+
+                                            var start = new Date('{{ config('dj.slot_range.start') }}');
+                                            var end = new Date('{{ config('dj.slot_range.end') }}');
+                                            var cur = new Date(start);
+                                            var found = 0;
+
+                                            while (cur <= end){
+                                                var day = cur.getDay();
+                                                if (day === 6 || day === 0){
+                                                    var dstr = formatDate(cur);
+                                                    var row = document.createElement('div'); row.className = 'd-flex align-items-center mb-2'; row.dataset.date = dstr;
+
+                                                    var cb = document.createElement('input'); cb.type = 'checkbox'; cb.className = 'form-check-input me-2 weekend-checkbox'; cb.dataset.date = dstr; cb.id = 'wk-'+dstr;
+                                                    var lbl = document.createElement('label'); lbl.htmlFor = 'wk-'+dstr; lbl.className = 'me-2'; lbl.textContent = dstr + ' (' + (day===6?'Sat':'Sun') + ')';
+
+                                                    var sel = document.createElement('select'); sel.className = 'form-select form-select-sm ms-auto'; sel.style.width = '160px'; sel.dataset.date = dstr;
+                                                    times.forEach(function(t){
+                                                        var opt = document.createElement('option'); opt.value = t;
+                                                        var taken = takenSlots.find(function(s){ return s.date === dstr && s.time === t; });
+                                                        if (taken){ opt.disabled = true; opt.textContent = t + ' — Taken by ' + taken.owner; }
+                                                        else { opt.textContent = t + ' — Available'; }
+                                                        sel.appendChild(opt);
+                                                    });
+
+                                                    row.appendChild(cb); row.appendChild(lbl); row.appendChild(sel);
+                                                    list.appendChild(row);
+                                                    found++;
+                                                }
+                                                cur.setDate(cur.getDate()+1);
+                                            }
+                                            if (!found) { list.innerHTML = '<div class="text-muted">No weekend dates in range</div>'; }
+
+                                            // on submit gather checked dates and times into slotInput
+                                            if (form){
+                                                form.addEventListener('submit', function(e){
+                                                    var boxes = list.querySelectorAll('.weekend-checkbox');
+                                                    var out = [];
+                                                    boxes.forEach(function(cb){
+                                                        if (cb.checked){
+                                                            var date = cb.dataset.date;
+                                                            var sel = list.querySelector('select[data-date="'+date+'"]');
+                                                            var time = sel ? sel.value : '';
+                                                            out.push({date: date, time: time});
+                                                        }
+                                                    });
+                                                    slotInput.value = out.length ? JSON.stringify(out) : '';
+                                                });
+                                            }
+                                        })();
+                                    </script>
+                </div>
+                <form method="POST" action="{{ route('admin.djs.store') }}" enctype="multipart/form-data" id="createDJForm">
+                    @csrf
+                    <div class="modal-body">
+                        @if ($errors->any())
+                            <div class="alert alert-danger">
+                                <ul class="mb-0">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
+                        <div class="mb-3">
+                            <label class="form-label">Name</label>
+                            <input type="text" name="name" class="form-control" value="{{ old('name') }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Video</label>
+                            <div id="videoDropZone" class="border rounded p-3 text-center" style="cursor: pointer;">
+                                <input id="videoInput" type="file" name="video" accept="video/*" class="form-control d-none">
+                                <div id="videoDropLabel">Drag & drop a video here, paste (Ctrl/Cmd+V), or click to select</div>
+                                <div id="videoFileName" class="mt-2 text-muted"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Available weekend dates</label>
+                            <div class="text-muted small">Showing weekend dates between {{ config('dj.slot_range.start') }} and {{ config('dj.slot_range.end') }}</div>
+                            <div id="weekendDatesList" class="mt-3"></div>
+                            <input type="hidden" name="slot" id="slotInput">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Create DJ</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    @if ($errors->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var el = document.getElementById('createDJModal');
+                if (el) {
+                    var modal = new bootstrap.Modal(el);
+                    modal.show();
+                }
+            });
+        </script>
+    @endif
+    <script>
+        (function(){
+            var zone = document.getElementById('videoDropZone');
+            var input = document.getElementById('videoInput');
+            var nameEl = document.getElementById('videoFileName');
+
+            if (zone){
+                zone.addEventListener('click', function(){ input.click(); });
+
+                input.addEventListener('change', function(){
+                    var f = input.files[0];
+                    nameEl.textContent = f ? f.name + ' (' + Math.round(f.size/1024/1024) + 'MB)' : '';
+                });
+
+                zone.addEventListener('dragover', function(e){ e.preventDefault(); zone.classList.add('bg-light'); });
+                zone.addEventListener('dragleave', function(e){ zone.classList.remove('bg-light'); });
+                zone.addEventListener('drop', function(e){
+                    e.preventDefault(); zone.classList.remove('bg-light');
+                    var f = e.dataTransfer.files && e.dataTransfer.files[0];
+                    if (f) { input.files = e.dataTransfer.files; nameEl.textContent = f.name + ' (' + Math.round(f.size/1024/1024) + 'MB)'; }
+                });
+
+                // paste support
+                document.addEventListener('paste', function(e){
+                    var items = e.clipboardData && e.clipboardData.items;
+                    if (!items) return;
+                    for (var i=0;i<items.length;i++){
+                        var item = items[i];
+                        if (item.kind === 'file' && item.type.indexOf('video') === 0){
+                            var blob = item.getAsFile();
+                            var dt = new DataTransfer();
+                            dt.items.add(blob);
+                            input.files = dt.files;
+                            nameEl.textContent = blob.name || 'pasted-video';
+                        }
+                    }
+                });
+            }
+        })();
+    </script>
+    <script>
+        (function(){
+            function pad(n){ return n<10? '0'+n : n; }
+            function formatDate(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+
+            // build takenSlots from server data
+            var takenSlots = [];
+            @if(isset($djs) && $djs->count())
+                @foreach($djs as $dj)
+                    @php $slots = json_decode($dj->slot, true) ?: []; @endphp
+                    @foreach($slots as $s)
+                        takenSlots.push({ date: '{{ $s['date'] }}', time: '{{ $s['time'] }}', owner: {!! json_encode($dj->name) !!} });
+                    @endforeach
+                @endforeach
+            @endif
+
+            var times = ['10:00','12:00','14:00','16:00','18:00','20:00'];
+            var list = document.getElementById('weekendDatesList');
+            var slotInput = document.getElementById('slotInput');
+            var form = document.getElementById('createDJForm');
+
+            var start = new Date('{{ config('dj.slot_range.start') }}');
+            var end = new Date('{{ config('dj.slot_range.end') }}');
+            var cur = new Date(start);
+            var found = 0;
+
+            while (cur <= end){
+                var day = cur.getDay();
+                if (day === 6 || day === 0){
+                    var dstr = formatDate(cur);
+                    var row = document.createElement('div'); row.className = 'd-flex align-items-center mb-2'; row.dataset.date = dstr;
+
+                    var cb = document.createElement('input'); cb.type = 'checkbox'; cb.className = 'form-check-input me-2 weekend-checkbox'; cb.dataset.date = dstr; cb.id = 'wk-'+dstr;
+                    var lbl = document.createElement('label'); lbl.htmlFor = 'wk-'+dstr; lbl.className = 'me-2'; lbl.textContent = dstr + ' (' + (day===6?'Sat':'Sun') + ')';
+
+                    var sel = document.createElement('select'); sel.className = 'form-select form-select-sm ms-auto'; sel.style.width = '160px'; sel.dataset.date = dstr;
+                    times.forEach(function(t){
+                        var opt = document.createElement('option'); opt.value = t;
+                        var taken = takenSlots.find(function(s){ return s.date === dstr && s.time === t; });
+                        if (taken){ opt.disabled = true; opt.textContent = t + ' — Taken by ' + taken.owner; }
+                        else { opt.textContent = t + ' — Available'; }
+                        sel.appendChild(opt);
+                    });
+
+                    row.appendChild(cb); row.appendChild(lbl); row.appendChild(sel);
+                    list.appendChild(row);
+                    found++;
+                }
+                cur.setDate(cur.getDate()+1);
+            }
+            if (!found) { list.innerHTML = '<div class="text-muted">No weekend dates in range</div>'; }
+
+            // on submit gather checked dates and times into slotInput
+            if (form){
+                form.addEventListener('submit', function(e){
+                    var boxes = list.querySelectorAll('.weekend-checkbox');
+                    var out = [];
+                    boxes.forEach(function(cb){
+                        if (cb.checked){
+                            var date = cb.dataset.date;
+                            var sel = list.querySelector('select[data-date="'+date+'"]');
+                            var time = sel ? sel.value : '';
+                            out.push({date: date, time: time});
+                        }
+                    });
+                    slotInput.value = out.length ? JSON.stringify(out) : '';
+                });
+            }
+        })();
+    </script>
+    </div>
+@endsection
