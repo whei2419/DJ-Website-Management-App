@@ -19,6 +19,35 @@ class DJController extends Controller
     }
 
     /**
+     * Get available dates with DJ counts for the date selector.
+     */
+    public function availableDates(Request $request)
+    {
+        try {
+            $dates = \App\Models\Date::orderBy('date', 'asc')
+                ->get()
+                ->map(function ($date) {
+                    $djCount = DJ::where('slot', $date->date->format('Y-m-d'))->count();
+                    return [
+                        'id' => $date->id,
+                        'date' => $date->date->format('Y-m-d'),
+                        'formatted_date' => $date->date->format('M d, Y'),
+                        'event_name' => $date->event_name,
+                        'location' => $date->location,
+                        'dj_count' => $djCount,
+                    ];
+                });
+
+            return response()->json(['data' => $dates]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'error' => 'Failed to load dates',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
      * Return DJs for AJAX with search and pagination.
      */
     public function list(Request $request)
@@ -84,12 +113,20 @@ class DJController extends Controller
      */
     public function store(Request $request)
     {
+        // Log the MIME type before validation to debug
+        if ($request->hasFile('video')) {
+            $file = $request->file('video');
+            \Log::info('Uploaded video MIME type: ' . $file->getMimeType());
+            \Log::info('Uploaded video client original name: ' . $file->getClientOriginalName());
+        }
+
         $request->validate([
             'name' => 'required|string|max:255',
-            'video' => 'nullable|file|mimetypes:video/mp4,video/quicktime,video/x-msvideo,video/x-ms-wmv,video/webm|max:200000',
+            'slot' => 'required|string|max:255',
+            'video' => 'required|file|mimetypes:video/mp4,video/quicktime,video/x-msvideo,video/x-ms-wmv,video/webm|max:200000',
         ]);
 
-        $data = $request->only(['name']);
+        $data = $request->only(['name', 'slot']);
 
         if ($request->hasFile('video')) {
             $file = $request->file('video');
@@ -101,7 +138,12 @@ class DJController extends Controller
             $data['video_url'] = $request->input('video_url');
         }
 
-        DJ::create($data);
+        $dj = DJ::create($data);
+
+        // Return JSON for AJAX requests
+        if ($request->wantsJson() || $request->expectsJson()) {
+            return response()->json(['success' => true, 'dj' => $dj], 201);
+        }
 
         return redirect()->route('admin.djs.index')->with('success', 'DJ created successfully.');
     }

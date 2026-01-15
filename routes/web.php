@@ -32,6 +32,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     
     // Admin DJ resource routes (omit separate create page — modal used)
+    Route::get('admin/djs/available-dates', [AdminDJController::class, 'availableDates'])->name('admin.djs.available-dates');
     Route::resource('admin/djs', AdminDJController::class)->except(['create'])->names([
         'index' => 'admin.djs.index',
         'store' => 'admin.djs.store',

@@ -25,9 +25,12 @@
                         </div>
                         <div class="mb-3">
                             <label for="slot" class="form-label">Time Slot</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-clock"></i></span>
-                                <input type="date" class="form-control" id="djSlot" name="slot" value="{{ old('slot', \Carbon\Carbon::today()->format('Y-m-d')) }}" required>
+                            <input type="hidden" id="djSlot" name="slot" required>
+                            <div id="dateGrid" class="date-grid">
+                                <div class="text-center text-muted py-3">
+                                    <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                                    Loading available dates...
+                                </div>
                             </div>
                             <small class="error-message"></small>
                         </div>
@@ -195,9 +198,64 @@
 @endsection
 
 @push('scripts')
+    <style>
+        .date-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.5rem;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 0.5rem;
+            border: 1px solid #e6e7e9;
+            border-radius: 4px;
+        }
+        .date-card {
+            border: 2px solid #e6e7e9;
+            border-radius: 4px;
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #fff;
+        }
+        .date-card:hover {
+            border-color: #206bc4;
+            box-shadow: 0 2px 8px rgba(32, 107, 196, 0.1);
+        }
+        .date-card.selected {
+            border-color: #206bc4;
+            background: #e8f3fd;
+        }
+        .date-card-date {
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: #1e293b;
+        }
+        .date-card-event {
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-top: 0.2rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .date-card-count {
+            display: inline-block;
+            margin-top: 0.35rem;
+            padding: 0.1rem 0.4rem;
+            background: #f1f5f9;
+            border-radius: 10px;
+            font-size: 0.65rem;
+            color: #475569;
+        }
+        .date-card.selected .date-card-count {
+            background: #206bc4;
+            color: #fff;
+        }
+    </style>
     <script>
         const djsDataRoute = "{{ route('admin.djs.list') }}";
         const saveDJRoute = "{{ route('admin.djs.store') }}";
+        const availableDatesRoute = "{{ route('admin.djs.available-dates') }}";
     </script>
     @vite(['resources/js/admin-djs-custom.js'])
 @endpush

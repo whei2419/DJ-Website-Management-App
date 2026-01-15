@@ -78,15 +78,23 @@ class AdminDJController extends Controller
     public function store(Request $request)
     {
         try {
+            // Log the MIME type before validation to debug
+            if ($request->hasFile('video')) {
+                $file = $request->file('video');
+                \Log::info('Uploaded video MIME type: ' . $file->getMimeType());
+                \Log::info('Uploaded video client original name: ' . $file->getClientOriginalName());
+            }
+
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
                 'slot' => 'required|string|max:255',
-                'video' => 'required|file|mimes:mp4,mov,avi,webm,quicktime,x-msvideo,x-ms-wmv|max:102400',
+                'video' => 'required|file|mimetypes:video/mp4,video/quicktime,video/x-msvideo,video/x-ms-wmv,video/webm|max:102400',
             ]);
 
             $path = null;
             if ($request->hasFile('video')) {
-                $path = $request->file('video')->store('djs', 'public');
+                $file = $request->file('video');
+                $path = $file->store('djs', 'public');
             }
 
             $dj = DJ::create([

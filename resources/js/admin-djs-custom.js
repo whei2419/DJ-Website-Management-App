@@ -7,22 +7,82 @@ document.addEventListener('DOMContentLoaded', () => {
     const DjTitle = document.getElementById('DjTitle');
     const addOpen = document.getElementById('addEditDJModal');
     const saveUrl = saveDJRoute;
+    const dateGrid = document.getElementById('dateGrid');
+    
+    let availableDates = [];
+
+    // Fetch available dates on page load
+    fetchAvailableDates();
+
+    function fetchAvailableDates() {
+        fetch(availableDatesRoute, {
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            availableDates = data.data || [];
+            renderDateGrid();
+        })
+        .catch(error => {
+            console.error('Error fetching dates:', error);
+            dateGrid.innerHTML = '<div class="text-danger text-center py-3">Failed to load dates</div>';
+        });
+    }
+
+    function renderDateGrid() {
+        if (availableDates.length === 0) {
+            dateGrid.innerHTML = '<div class="text-muted text-center py-3">No dates available</div>';
+            return;
+        }
+
+        dateGrid.innerHTML = availableDates.map(date => `
+            <div class="date-card" data-date="${date.date}">
+                <div class="date-card-date">${date.formatted_date}</div>
+                ${date.event_name ? `<div class="date-card-event">${date.event_name}</div>` : ''}
+                <div class="date-card-count">${date.dj_count} DJ${date.dj_count !== 1 ? 's' : ''}</div>
+            </div>
+        `).join('');
+
+        // Add click handlers to date cards
+        document.querySelectorAll('.date-card').forEach(card => {
+            card.addEventListener('click', () => selectDate(card));
+        });
+    }
+
+    function selectDate(card) {
+        // Remove previous selection
+        document.querySelectorAll('.date-card').forEach(c => c.classList.remove('selected'));
+        
+        // Select new date
+        card.classList.add('selected');
+        slotInput.value = card.dataset.date;
+        
+        // Clear error if any
+        slotInput.classList.remove('is-invalid');
+        const errEl = getErrorEl(slotInput);
+        if (errEl) errEl.textContent = '';
+    }
     
 
     // on opening the modal, update the form action and inputs
     function updateModalInfo(isAdd, djData = null) {
         if (isAdd) {
             DjTitle.innerHTML = "Add DJ";
-            // default the slot to today's date (YYYY-MM-DD) for date-only input
-            const today = new Date();
-            const yyyy = today.getFullYear();
-            const mm = String(today.getMonth() + 1).padStart(2, '0');
-            const dd = String(today.getDate()).padStart(2, '0');
-            slotInput.value = `${yyyy}-${mm}-${dd}`;
+            // reset selections
+            slotInput.value = "";
+            document.querySelectorAll('.date-card').forEach(c => c.classList.remove('selected'));
         } else {
             DjTitle.innerHTML = "Edit DJ";
             nameInput.value = djData.name;
             slotInput.value = djData.slot;
+            // select the matching date card
+            document.querySelectorAll('.date-card').forEach(card => {
+                if (card.dataset.date === djData.slot) {
+                    card.classList.add('selected');
+                }
+            });
             // video input left blank for security reasons
         }
     }
