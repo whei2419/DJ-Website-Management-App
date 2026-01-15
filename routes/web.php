@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\DJController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,4 +19,8 @@ Route::get('/', function () {
 });
 Route::get('/admin', function () {
     return view('admin.dashboard');
+});
+
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::resource('djs', DJController::class);
 });
