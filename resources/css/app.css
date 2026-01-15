@@ -1,0 +1,6 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import Tabler CSS */
+@import '@tabler/core/dist/css/tabler.min.css';

@@ -7,11 +7,15 @@
     <title>@yield('title','Admin')</title>
     @vite(['resources/js/admin.js','resources/sass/admin.scss'])
   </head>
-  <body>
+  <body class="{{ str_replace('.', '-', Route::currentRouteName()) }}">
     <header class="navbar navbar-expand navbar-dark bg-dark">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="/admin">Admin</a>
-      </div>
+      @hasSection('hide-navbar')
+        <!-- Navbar hidden for this page -->
+      @else
+        <div class="container-fluid">
+          <a class="navbar-brand" href="/admin">Admin</a>
+        </div>
+      @endif
     </header>
 
     <div class="container-fluid">

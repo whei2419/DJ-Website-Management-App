@@ -1,7 +1,7 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\DJController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,13 +15,17 @@ use App\Http\Controllers\Admin\DJController;
 */
 
 Route::get('/', function () {
-    return view('site.home');
-});
-Route::get('/admin', function () {
-    return view('admin.dashboard');
+    return view('welcome');
 });
 
-Route::prefix('admin')->name('admin.')->group(function () {
-    Route::post('djs/switch-slots', [DJController::class, 'switchSlots'])->name('djs.switch-slots');
-    Route::resource('djs', DJController::class);
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+require __DIR__.'/auth.php';
