@@ -1,4 +1,4 @@
-## DJ and Voter Web App
+## DJ Website Management App
 
 This application manages DJs and their time slots efficiently. It includes an admin panel for managing DJs and a frontend for showcasing schedules.
 
