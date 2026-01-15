@@ -47,18 +47,18 @@
         {{-- Content start here --}}
         <div class="container-xl">
             <div class="page-body">
-                <div class="row row-deck row-cards p-2">
+                <div class="row row-deck row-cards">
                     <div class="col-12">
-                        <div class="card">
+                        <div class="card px-3 py-4">
                             <div class="card-table">
                                 <div id="advanced-table">
                                     <div class="table-responsive">
-                                        <table id="dates-table" class="table table-vcenter table-selectable table-hover table-sm align-middle">
+                                        <table id="dates-table" class="table table-vcenter table-selectable table-hover align-middle table-modern">
                                             <thead>
                                                 <tr>
-                                                    <th>ID</th>
-                                                    <th>Date</th>
-                                                    <th>Actions</th>
+                                                    <th><i class="fas fa-hashtag me-2 text-muted"></i>ID</th>
+                                                    <th><i class="fas fa-calendar-alt me-2 text-muted"></i>Date</th>
+                                                    <th class="text-end"><i class="fas fa-ellipsis-v me-2 text-muted"></i>Actions</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
