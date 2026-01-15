@@ -24,4 +24,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // Admin DJs for AJAX - supports search & pagination (queried from JS)
     // Use dedicated API controller for list endpoint
     Route::get('admin/djs/list', [ApiAdminDJController::class, 'list'])->name('admin.djs.list');
+    // Create a new DJ (with optional video upload)
+    Route::post('admin/djs', [ApiAdminDJController::class, 'store'])->name('admin.djs.store');
 });

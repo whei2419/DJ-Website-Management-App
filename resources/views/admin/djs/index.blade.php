@@ -43,7 +43,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn me-auto" data-bs-dismiss="modal">Close</button>
-                    <button id="saveDJButton" class="btn btn-primary">Save changes</button>
+                    <button id="saveDJButton" class="btn btn-primary"><i class="fas fa-save me-2"></i>Save changes</button>
                 </div>
             </div>
         </div>
@@ -80,12 +80,12 @@
                                                         <kbd>ctrl + K</kbd>
                                                     </span>
                                                 </div>
-                                                <a href="#" id="addOpen" class="btn btn-primary btn-0" data-bs-toggle="modal" data-bs-target="#addEditDJModal"> Add Dj</a>
+                                                <a href="#" id="addOpen" class="btn btn-primary btn-0 d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#addEditDJModal"><i class="fas fa-plus me-2"></i> Add Dj</a>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div id="advanced-table">
+                                <div id="advanced-table"> 
                                     <div class="table-responsive">
                                         <table class="table table-vcenter table-selectable">
                                             <thead>

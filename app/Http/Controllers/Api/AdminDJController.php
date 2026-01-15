@@ -71,4 +71,36 @@ class AdminDJController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Store a new DJ (accepts optional video upload).
+     */
+    public function store(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'slot' => 'required|string|max:255',
+                'video' => 'required|file|mimes:mp4,mov,avi,webm|max:102400',
+            ]);
+
+            $path = null;
+            if ($request->hasFile('video')) {
+                $path = $request->file('video')->store('djs', 'public');
+            }
+
+            $dj = DJ::create([
+                'name' => $validated['name'],
+                'slot' => $validated['slot'],
+                'video_path' => $path,
+            ]);
+
+            return response()->json(['data' => $dj], 201);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'error' => 'Failed to save DJ',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }

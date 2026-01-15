@@ -52,6 +52,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!validateForm()) {
             return;
         }
+
+        // submit via fetch
+        
         
     };
 
