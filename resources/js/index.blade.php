@@ -53,7 +53,7 @@
                             <div class="card-table">
                                 <div id="advanced-table">
                                     <div class="table-responsive">
-                                        <table id="dates-table" class="table table-vcenter table-selectable table-hover table-sm align-middle">
+                                        <table id="dates-table" class="table table-vcenter table-selectable">
                                             <thead>
                                                 <tr>
                                                     <th>ID</th>
@@ -65,9 +65,13 @@
                                                 @foreach($dates as $date)
                                                     <tr data-id="{{ $date->id }}">
                                                         <td>{{ $date->id }}</td>
-                                                        <td><span class="badge bg-primary text-white">{{ $date->date->format('Y-m-d (l)') }}</span></td>
+                                                        <td>{{ $date->date->format('Y-m-d (l)') }}</td>
                                                         <td>
-                                                            @include('admin.dates.partials.actions', ['date' => $date])
+                                                            <form method="POST" action="{{ route('admin.dates.destroy', $date) }}" class="d-inline delete-date-form">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="button" class="btn btn-sm btn-danger btn-delete-date">Delete</button>
+                                                            </form>
                                                         </td>
                                                     </tr>
                                                 @endforeach
@@ -87,7 +91,7 @@
 
 @push('scripts')
     <script>
-        const dataTablesRoute = "{{ route('admin.dates.list') }}";
+        const dataTablesRoute = "{{ route('admin.dates.data') }}";
     </script>
     @vite(['resources/js/admin-dates.js'])
 @endpush

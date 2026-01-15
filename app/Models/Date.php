@@ -9,7 +9,7 @@ class Date extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['date'];
+    protected $fillable = ['date', 'event_name', 'location'];
 
     protected $casts = [
         'date' => 'date',

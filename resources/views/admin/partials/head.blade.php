@@ -1,7 +1,12 @@
 {{-- Admin head partial: assets and head-only includes --}}
-@vite(['resources/js/admin.js','resources/sass/admin.scss'])
-@include('components.font-awesome')
-<link rel="stylesheet" href="//cdn.datatables.net/2.3.6/css/dataTables.dataTables.min.css">
+<!-- Load jQuery and DataTables early so Vite bundles can depend on them -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  console.log('head loaded');
+</script>
+@vite(['resources/sass/admin.scss'])
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.datatables.net/2.3.6/css/dataTables.bootstrap5.min.css">
 <style>
   /* Small UI polish for admin toasts and icon buttons moved here from layout */
   .btn-icon { width:34px; height:34px; padding:6px; display:inline-flex; align-items:center; justify-content:center; border-radius:6px; }

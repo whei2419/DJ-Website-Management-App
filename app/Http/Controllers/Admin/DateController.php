@@ -16,6 +16,19 @@ class DateController extends Controller
         $dates = Date::orderBy('date', 'asc')->get();
         return view('admin.dates.index', compact('dates'));
     }
+    
+    public function list()
+    {
+        $dates = Date::orderBy('date', 'asc')->get()->map(function ($date) {
+            return [
+                'id' => $date->id,
+                'date' => $date->date->format('Y-m-d (l)'),
+                'actions' => view('admin.dates.partials.actions', ['date' => $date])->render(),
+            ];
+        });
+
+        return response()->json(['data' => $dates]);
+    }
 
     /**
      * Store a newly created resource in storage.

@@ -1,6 +1,7 @@
 // Admin toaster module (bundled)
+// Admin toaster module (Tabler/Bootstrap toast markup)
 (function(){
-  function show(type, message, timeout = 4000){
+  function show(type, message, options = {}){
     if(!message) return;
     var container = document.getElementById('tablerToasts');
     if(!container) return;
@@ -11,44 +12,78 @@
       warning: '#f59e0b',
       info: '#2563eb'
     };
+    var titleText = (type === 'success') ? 'Success' : (type === 'error' ? 'Error' : (type === 'warning' ? 'Warning' : 'Info'));
     var color = colors[type] || colors.info;
+    var avatarUrl = options.avatar || null;
+    var title = options.title || titleText;
+    var timestamp = options.time || 'Just now';
+    var autohide = typeof options.autohide === 'undefined' ? (options.timeout ? true : false) : options.autohide;
+    var timeout = options.timeout || 4000;
 
-    var el = document.createElement('div');
-    el.className = 'admin-toast mb-2 p-2 d-flex align-items-center shadow-sm rounded bg-white border';
-    el.style.minWidth = '260px';
-    el.setAttribute('role','alert');
-    el.style.borderLeftColor = color;
+    var toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.setAttribute('role','alert');
+    toast.setAttribute('aria-live','assertive');
+    toast.setAttribute('aria-atomic','true');
+    toast.setAttribute('data-bs-autohide', autohide ? 'true' : 'false');
+    toast.setAttribute('data-bs-toggle','toast');
+    toast.classList.add('mb-2');
 
-    var icon = document.createElement('div');
-    icon.className = 'admin-toast-icon';
-    icon.innerHTML = (type === 'success') ? '<i class="fas fa-check-circle" style="color:' + color + '"></i>' :
-                     (type === 'error') ? '<i class="fas fa-times-circle" style="color:' + color + '"></i>' :
-                     (type === 'warning') ? '<i class="fas fa-exclamation-triangle" style="color:' + color + '"></i>' :
-                     '<i class="fas fa-info-circle" style="color:' + color + '"></i>';
+    var header = document.createElement('div');
+    header.className = 'toast-header d-flex align-items-center';
+
+    if(avatarUrl){
+      var span = document.createElement('span');
+      span.className = 'avatar avatar-xs me-2';
+      span.style.backgroundImage = 'url(' + avatarUrl + ')';
+      header.appendChild(span);
+    } else {
+      var span = document.createElement('span');
+      span.className = 'avatar avatar-xs me-2';
+      span.style.backgroundColor = color;
+      span.innerHTML = '<i class="fas fa-bell" style="color:#fff;font-size:10px"></i>';
+      header.appendChild(span);
+    }
+
+    var strong = document.createElement('strong');
+    strong.className = 'me-auto';
+    strong.innerText = title;
+
+    var small = document.createElement('small');
+    small.innerText = timestamp;
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'ms-2 btn-close';
+    btn.setAttribute('data-bs-dismiss','toast');
+    btn.setAttribute('aria-label','Close');
+
+    header.appendChild(strong);
+    header.appendChild(small);
+    header.appendChild(btn);
 
     var body = document.createElement('div');
-    body.className = 'admin-toast-body';
-    var title = document.createElement('div');
-    title.className = 'title';
-    title.innerText = (type === 'success') ? 'Success' : (type === 'error' ? 'Error' : (type === 'warning' ? 'Warning' : 'Info'));
-    var msg = document.createElement('div');
-    msg.className = 'message';
-    msg.innerText = message;
-    body.appendChild(title);
-    body.appendChild(msg);
+    body.className = 'toast-body';
+    body.innerText = message;
 
-    var close = document.createElement('button');
-    close.className = 'btn btn-link text-muted p-0 ms-3';
-    close.style.border = 'none';
-    close.innerHTML = '<i class="fas fa-times"></i>';
-    close.addEventListener('click', function(){ if(container.contains(el)) container.removeChild(el); });
+    toast.appendChild(header);
+    toast.appendChild(body);
 
-    el.appendChild(icon);
-    el.appendChild(body);
-    el.appendChild(close);
-    container.appendChild(el);
+    container.appendChild(toast);
 
-    setTimeout(function(){ if(container.contains(el)) container.removeChild(el); }, timeout);
+    // Use Bootstrap Toast if available, otherwise fallback to simple show/remove
+    if(window.bootstrap && window.bootstrap.Toast){
+      var bsToast = new bootstrap.Toast(toast, { autohide: autohide, delay: timeout });
+      bsToast.show();
+      // ensure element is removed when hidden
+      toast.addEventListener('hidden.bs.toast', function(){ if(container.contains(toast)) container.removeChild(toast); });
+    } else {
+      toast.classList.add('show');
+      if(autohide){
+        setTimeout(function(){ if(container.contains(toast)) container.removeChild(toast); }, timeout);
+      }
+      btn.addEventListener('click', function(){ if(container.contains(toast)) container.removeChild(toast); });
+    }
   }
 
   window.adminToaster = { show };

@@ -65,14 +65,14 @@
     @endif
 
     @yield('content')
-
     <!-- Global toaster -->
     <div id="tablerToasts" class="position-fixed top-0 end-0 p-3"
-        style="z-index:1080; width: 360px; margin-top: 64px;">
+        style="z-index:1080; width: 360px;">
         <!-- toasts will be injected here -->
     </div>
-
     @include('admin.partials.scripts')
+    @vite(['resources/js/admin.js'])
+    @stack('scripts')
 </body>
 
 </html>

@@ -47,6 +47,9 @@ Route::middleware('auth')->group(function () {
         'update' => 'admin.dates.update',
         'destroy' => 'admin.dates.destroy',
     ]);
+
+    //Admin dates for AJAX
+    Route::get('admin/dates/list', [AdminDateController::class, 'list'])->name('admin.dates.list');
 });
 
 require __DIR__.'/auth.php';
