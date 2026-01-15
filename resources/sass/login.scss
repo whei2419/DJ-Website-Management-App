@@ -7,11 +7,14 @@ body.login {
   align-items: center;
   height: 100vh;
   margin: 0;
+  padding: 15px;
 }
 
 .card {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
+  width: 100%;
+  max-width: 400px;
 }
 
 .card-header {
@@ -20,4 +23,15 @@ body.login {
   text-align: center;
   font-size: 1.25rem;
   font-weight: bold;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  body.login {
+    padding: 10px;
+  }
+
+  .card {
+    width: 100%;
+  }
 }

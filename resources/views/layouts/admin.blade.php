@@ -6,6 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title','Admin')</title>
     @vite(['resources/js/admin.js','resources/sass/admin.scss'])
+    @include('components.font-awesome')
   </head>
   <body class="{{ str_replace('.', '-', Route::currentRouteName()) }}">
     @if(Route::currentRouteName() !== 'login')
