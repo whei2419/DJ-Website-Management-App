@@ -8,28 +8,20 @@
     @vite(['resources/js/admin.js','resources/sass/admin.scss'])
   </head>
   <body class="{{ str_replace('.', '-', Route::currentRouteName()) }}">
-    <header class="navbar navbar-expand navbar-dark bg-dark">
-      @hasSection('hide-navbar')
-        <!-- Navbar hidden for this page -->
-      @else
+    @if(Route::currentRouteName() !== 'login')
+      <header class="navbar navbar-expand navbar-dark bg-dark">
         <div class="container-fluid">
           <a class="navbar-brand" href="/admin">Admin</a>
-        </div>
-      @endif
-    </header>
-
-    <div class="container-fluid">
-      <div class="row">
-        <aside class="col-md-2 py-4">
-          <ul class="nav flex-column">
+          <ul class="navbar-nav ms-auto">
             <li class="nav-item"><a class="nav-link" href="/admin">Dashboard</a></li>
             <li class="nav-item"><a class="nav-link" href="#">DJs</a></li>
           </ul>
-        </aside>
-        <section class="col-md-10 py-4">
-          @yield('content')
-        </section>
-      </div>
+        </div>
+      </header>
+    @endif
+
+    <div class="container-fluid py-4">
+      @yield('content')
     </div>
   </body>
 </html>
