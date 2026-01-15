@@ -19,6 +19,59 @@ class DJController extends Controller
     }
 
     /**
+     * Return DJs for AJAX with search and pagination.
+     */
+    public function list(Request $request)
+    {
+        try {
+            $perPage = (int) $request->input('per_page', 20);
+            $search = $request->input('search');
+
+            $query = DJ::query();
+
+            if (!empty($search)) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('slot', 'like', "%{$search}%");
+                });
+            }
+
+            $query->orderBy('name', 'asc');
+
+            $paginated = $query->paginate($perPage);
+
+            $data = $paginated->getCollection()->map(function ($dj) {
+                $videoPreview = $dj->video_path
+                    ? (Storage::disk('public')->exists($dj->video_path) ? Storage::disk('public')->url($dj->video_path) : null)
+                    : ($dj->video_url ?? null);
+
+                return [
+                    'id' => $dj->id,
+                    'video_preview' => $videoPreview,
+                    'name' => $dj->name,
+                    'slot' => $dj->slot ?? '-',
+                    'actions' => view('admin.djs.partials.actions', ['dj' => $dj])->render(),
+                ];
+            })->values();
+
+            return response()->json([
+                'data' => $data,
+                'meta' => [
+                    'total' => $paginated->total(),
+                    'per_page' => $paginated->perPage(),
+                    'current_page' => $paginated->currentPage(),
+                    'last_page' => $paginated->lastPage(),
+                ],
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'error' => 'Failed to load DJs',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()

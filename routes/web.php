@@ -50,6 +50,7 @@ Route::middleware('auth')->group(function () {
 
     //Admin dates for AJAX
     Route::get('admin/dates/list', [AdminDateController::class, 'list'])->name('admin.dates.list');
+    // Admin DJs for AJAX (moved to API routes)
 });
 
 require __DIR__.'/auth.php';
