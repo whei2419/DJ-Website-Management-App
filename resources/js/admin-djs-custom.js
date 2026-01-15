@@ -6,11 +6,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveDJButton = document.getElementById('saveDJButton');
     const DjTitle = document.getElementById('DjTitle');
     const addOpen = document.getElementById('addEditDJModal');
+    const saveUrl = saveDJRoute;
+    
 
     // on opening the modal, update the form action and inputs
     function updateModalInfo(isAdd, djData = null) {
         if (isAdd) {
             DjTitle.innerHTML = "Add DJ";
+            // default the slot to today's date (YYYY-MM-DD) for date-only input
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            slotInput.value = `${yyyy}-${mm}-${dd}`;
         } else {
             DjTitle.innerHTML = "Edit DJ";
             nameInput.value = djData.name;
@@ -36,16 +44,19 @@ document.addEventListener('DOMContentLoaded', () => {
         // gather form data
         const formData = new FormData();
         formData.append('name', nameInput.value);
-        formData.append('slot', slotInput.value);
-        if (videoInput.value) {
-            formData.append('video', videoInput.value);
+        // ensure date-only value (YYYY-MM-DD) is sent
+        const slotValue = slotInput.value ? slotInput.value : '';
+        formData.append('slot', slotValue);
+        // append file object for video if present
+        if (videoInput && videoInput.files && videoInput.files.length > 0) {
+            formData.append('video', videoInput.files[0]);
         }
 
         // log form data for debugging
         console.log('Form Data:', {
             name: nameInput.value,
-            slot: slotInput.value,
-            video: videoInput.value
+            slot: slotValue,
+            video: (videoInput.files && videoInput.files.length > 0) ? videoInput.files[0].name : null
         });
 
         // validate form
@@ -53,9 +64,47 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // submit via fetch
-        
-        
+        // submit via fetch; request JSON to ensure Laravel returns JSON for validation/errors
+        fetch(saveUrl, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json'
+            }
+        })
+        .then(async (response) => {
+            const contentType = response.headers.get('content-type') || '';
+            if (contentType.includes('application/json')) {
+                const data = await response.json();
+                return { ok: response.ok, status: response.status, data };
+            }
+            // not JSON: capture text for debugging (likely an HTML error/redirect)
+            const text = await response.text();
+            throw new Error(`Non-JSON response (status ${response.status}): ${text}`);
+        })
+        .then(({ ok, data }) => {
+            if (ok && data.success) {
+                console.log('DJ saved successfully:', data.dj);
+            } else if (!ok && data) {
+                // server returned JSON error payload (e.g., validation errors)
+                console.error('Server validation/error response:', data);
+                // map validation errors to form fields if present
+                if (data.errors) {
+                    Object.keys(data.errors).forEach(key => {
+                        const input = document.getElementById(`dj${key.charAt(0).toUpperCase() + key.slice(1)}`) || document.querySelector(`[name="${key}"]`);
+                        const errEl = input ? getErrorEl(input) : null;
+                        if (input) input.classList.add('is-invalid');
+                        if (errEl) errEl.textContent = data.errors[key].join(', ');
+                    });
+                }
+            } else {
+                console.error('Unexpected server response:', data);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
     };
 
     // helper to find the nearest .error-message for an input
@@ -95,8 +144,16 @@ document.addEventListener('DOMContentLoaded', () => {
             videoInput.classList.add('is-invalid');
             if (videoErr) videoErr.textContent = 'Video Preview is required.';
         } else {
-            videoInput.classList.remove('is-invalid');
-            if (videoErr) videoErr.textContent = '';
+            const allowedTypes = ['video/webm', 'video/mp4', 'video/ogg']; // Add valid video types
+            const fileType = videoInput.files[0].type;
+            if (!allowedTypes.includes(fileType)) {
+                isValid = false;
+                videoInput.classList.add('is-invalid');
+                if (videoErr) videoErr.textContent = `Invalid file type. Allowed: ${allowedTypes.join(', ')}`;
+            } else {
+                videoInput.classList.remove('is-invalid');
+                if (videoErr) videoErr.textContent = '';
+            }
         }
 
         // Slot

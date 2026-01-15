@@ -81,7 +81,7 @@ class AdminDJController extends Controller
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
                 'slot' => 'required|string|max:255',
-                'video' => 'required|file|mimes:mp4,mov,avi,webm|max:102400',
+                'video' => 'required|file|mimes:mp4,mov,avi,webm,quicktime,x-msvideo,x-ms-wmv|max:102400',
             ]);
 
             $path = null;

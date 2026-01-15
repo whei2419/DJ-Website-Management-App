@@ -27,7 +27,7 @@
                             <label for="slot" class="form-label">Time Slot</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fas fa-clock"></i></span>
-                                <input type="text" class="form-control" id="djSlot" name="slot" required>
+                                <input type="date" class="form-control" id="djSlot" name="slot" value="{{ old('slot', \Carbon\Carbon::today()->format('Y-m-d')) }}" required>
                             </div>
                             <small class="error-message"></small>
                         </div>
@@ -197,6 +197,7 @@
 @push('scripts')
     <script>
         const djsDataRoute = "{{ route('admin.djs.list') }}";
+        const saveDJRoute = "{{ route('admin.djs.store') }}";
     </script>
     @vite(['resources/js/admin-djs-custom.js'])
 @endpush
