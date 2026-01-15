@@ -1,5 +1,6 @@
-// Admin JS entry: import Tabler CSS + JS
 import '@tabler/core/dist/css/tabler.min.css';
 import '@tabler/core/dist/js/tabler.min.js';
+import './admin-toaster';
+import './admin-dates';
 
-console.log('admin.js loaded')
+console.log('admin.js loaded');
