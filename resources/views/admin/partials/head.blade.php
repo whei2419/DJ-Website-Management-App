@@ -9,4 +9,6 @@
   #tablerToasts .admin-toast .admin-toast-icon { font-size:20px; line-height:1; }
   #tablerToasts .admin-toast .admin-toast-body .title { font-weight:600; font-size:13px; }
   #tablerToasts .admin-toast .admin-toast-body .message { font-size:13px; color:#475569; }
+  /* Avatar initial styling */
+  .avatar-initial { width:36px; height:36px; display:inline-flex; align-items:center; justify-content:center; border-radius:50%; background:#0f1724; color:#fff; font-weight:700; }
 </style>
