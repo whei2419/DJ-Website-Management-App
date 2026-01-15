@@ -1,34 +1,84 @@
+/* Import Tabler CSS */
+@import '@tabler/core/dist/css/tabler.min.css';
+
 /* Styles specific to the login page */
 
 body.login {
-  background-color: #f8f9fa;
+  background-color: #f4f6f9;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
   margin: 0;
-  padding: 15px;
+  padding: 20px;
 }
 
 .card {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  width: 100%;
-  max-width: 400px;
+  border-radius: 12px;
+  background-color: #ffffff;
+  padding: 30px;
 }
 
 .card-header {
-  background-color: #007bff;
-  color: #fff;
+  background-color: #4c6ef5;
+  color: #ffffff;
   text-align: center;
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: bold;
+  padding: 20px;
+  border-bottom: none;
+}
+
+.card-body {
+  padding: 25px;
+}
+
+.form-label {
+  font-weight: 600;
+  color: #495057;
+}
+
+.form-control {
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+  padding: 10px 15px;
+}
+
+.form-control:focus {
+  border-color: #4c6ef5;
+  box-shadow: 0 0 0 0.2rem rgba(76, 110, 245, 0.25);
+}
+
+.btn-primary {
+  background-color: #4c6ef5;
+  border-color: #4c6ef5;
+  padding: 12px 20px;
+  font-size: 1rem;
+}
+
+.btn-primary:hover {
+  background-color: #3b5bdb;
+  border-color: #364fc7;
+}
+
+.text-danger {
+  font-size: 0.875rem;
+}
+
+.text-center {
+  margin-bottom: 25px;
+}
+
+.fa-solid {
+  color: #6c757d; /* Lighter color for icons */
+  margin-right: 8px; /* Add spacing between icon and text */
 }
 
 /* Responsive design */
 @media (max-width: 768px) {
   body.login {
-    padding: 10px;
+    padding: 15px;
   }
 
   .card {
