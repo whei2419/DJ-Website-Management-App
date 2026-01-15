@@ -22,5 +22,6 @@ Route::get('/admin', function () {
 });
 
 Route::prefix('admin')->name('admin.')->group(function () {
+    Route::post('djs/switch-slots', [DJController::class, 'switchSlots'])->name('djs.switch-slots');
     Route::resource('djs', DJController::class);
 });
