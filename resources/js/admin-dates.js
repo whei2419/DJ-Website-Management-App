@@ -117,5 +117,162 @@ table.on('draw.dt', function() {
     }
 });
 
+// Delete flow: show confirmation modal, submit AJAX, remove row and show toast
+(function(){
+    let deleteForm = null;
+    let deleteRowNode = null;
+
+    // Delegate click handler for delete buttons
+    document.addEventListener('click', function(e){
+        const btn = e.target.closest('.btn-delete-date');
+        if (!btn) return;
+        e.preventDefault();
+
+        // find the closest form and table row
+        const form = btn.closest('form');
+        const row = btn.closest('tr');
+
+        deleteForm = form;
+        deleteRowNode = row;
+
+        // populate modal message with optional date text
+        const dateText = row ? (row.querySelector('td:nth-child(2)')?.innerText || '') : '';
+        const msg = document.getElementById('confirmDeleteMessage');
+        if (msg && dateText) {
+            msg.textContent = `Delete "${dateText.trim()}" — this action cannot be undone.`;
+        }
+
+        // show modal
+        const modalEl = document.getElementById('confirmDeleteModal');
+        if (modalEl && typeof bootstrap !== 'undefined') {
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+        }
+    });
+
+    // Confirm delete button
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    if (confirmBtn) {
+        confirmBtn.addEventListener('click', function(){
+            if (!deleteForm) return;
+
+            // submit via AJAX using FormData (includes _token and _method)
+            const action = deleteForm.getAttribute('action');
+            const method = deleteForm.getAttribute('method') || 'POST';
+            const fd = new FormData(deleteForm);
+
+            fetch(action, {
+                method: method.toUpperCase(),
+                body: fd,
+                credentials: 'same-origin',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            }).then(r => r.json()).then(json => {
+                // close modal
+                const modalEl = document.getElementById('confirmDeleteModal');
+                if (modalEl && typeof bootstrap !== 'undefined') {
+                    try { bootstrap.Modal.getInstance(modalEl).hide(); } catch (e) { /* ignore */ }
+                }
+
+                if (json && json.success) {
+                    // remove row from DataTable if present
+                    try {
+                        const dtRow = table.row(deleteRowNode);
+                        dtRow.remove().draw(false);
+                    } catch (e) {
+                        // fallback: remove DOM row
+                        if (deleteRowNode && deleteRowNode.parentNode) deleteRowNode.parentNode.removeChild(deleteRowNode);
+                    }
+
+                    if (window.adminToaster) window.adminToaster.show('success', json.message || 'Date deleted');
+                } else {
+                    if (window.adminToaster) window.adminToaster.show('danger', (json && json.message) || 'Failed to delete');
+                }
+            }).catch(err => {
+                if (window.adminToaster) window.adminToaster.show('danger', 'Failed to delete');
+            }).finally(() => {
+                deleteForm = null; deleteRowNode = null;
+            });
+        });
+    }
+})();
+
+// Add date via AJAX (prevent full page reload)
+(function(){
+    const addForm = document.getElementById('addDateForm');
+    if (!addForm) return;
+
+    addForm.addEventListener('submit', function(e){
+        e.preventDefault();
+
+        const submitBtn = addForm.querySelector('[type="submit"]');
+        if (submitBtn) submitBtn.disabled = true;
+
+        const action = addForm.getAttribute('action');
+        const method = (addForm.getAttribute('method') || 'POST').toUpperCase();
+        const fd = new FormData(addForm);
+
+        fetch(action, {
+            method: method,
+            body: fd,
+            credentials: 'same-origin',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        }).then(async res => {
+            const json = await res.json().catch(() => null);
+            if (res.ok && json && json.success) {
+                const d = json.date || json;
+                const id = d.id;
+                const dateText = d.date_formatted || d.date || d.date_formatted;
+
+                // build actions HTML (client-side) using CSRF token
+                const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+                const actionsHtml = `
+                    <form method="POST" action="/admin/dates/${id}" class="d-inline delete-date-form">
+                        <input type="hidden" name="_token" value="${token}">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <button type="button" class="btn btn-sm btn-icon btn-outline-danger btn-delete-date" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
+                `;
+
+                // add to DataTable
+                try {
+                    table.row.add({ id: id, date: dateText, actions: actionsHtml }).draw(false);
+                } catch (e) {
+                    // fallback: reload page
+                    window.location.reload();
+                }
+
+                // close modal
+                const modalEl = document.getElementById('addDateModal');
+                if (modalEl && typeof bootstrap !== 'undefined') {
+                    try { bootstrap.Modal.getInstance(modalEl).hide(); } catch (e) { /* ignore */ }
+                }
+
+                // reset form
+                addForm.reset();
+
+                if (window.adminToaster) window.adminToaster.show('success', json.message || 'Date added');
+            } else {
+                // display errors
+                if (json && json.errors) {
+                    const messages = Object.values(json.errors).flat().join(' ');
+                    if (window.adminToaster) window.adminToaster.show('danger', messages);
+                } else {
+                    if (window.adminToaster) window.adminToaster.show('danger', json?.message || 'Failed to create date');
+                }
+            }
+        }).catch(err => {
+            if (window.adminToaster) window.adminToaster.show('danger', 'Failed to create date');
+        }).finally(() => {
+            if (submitBtn) submitBtn.disabled = false;
+        });
+    });
+})();
+
 // Additional admin-dates.js functionality can be added here
 
