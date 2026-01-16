@@ -3,6 +3,8 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\DJController as AdminDJController;
 use App\Http\Controllers\Admin\DateController as AdminDateController;
+//Add import for SiteController
+use App\Http\Controllers\SiteController;
 use App\Http\Controllers\Admin\DashboardController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,9 +19,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [SiteController::class, 'index'])->name('site.index');
 
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
