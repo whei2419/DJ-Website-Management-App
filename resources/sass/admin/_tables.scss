@@ -1,0 +1,87 @@
+/* DataTables Custom Styling for Admin Tables */
+
+// Wrapper styling
+.dataTables_wrapper {
+    // Bottom row (info and pagination)
+    .row {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid #e6e7e9;
+        margin: 0;
+    }
+
+    // Info text (Showing X to Y of Z entries)
+    .dataTables_info {
+        padding-top: 0.5rem;
+    }
+
+    // Pagination
+    .dataTables_paginate {
+        text-align: right;
+        padding-top: 0.5rem;
+
+        .pagination {
+            margin: 0;
+        }
+    }
+}
+
+// Date grid styling (for DJ page date selector)
+.date-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.5rem;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 0.5rem;
+    border: 1px solid #e6e7e9;
+    border-radius: 4px;
+}
+
+.date-card {
+    border: 2px solid #e6e7e9;
+    border-radius: 4px;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #fff;
+
+    &:hover {
+        border-color: #206bc4;
+        box-shadow: 0 2px 8px rgba(32, 107, 196, 0.1);
+    }
+
+    &.selected {
+        border-color: #206bc4;
+        background: #e8f3fd;
+
+        .date-card-count {
+            background: #206bc4;
+            color: #fff;
+        }
+    }
+}
+
+.date-card-date {
+    font-weight: 600;
+    font-size: 0.75rem;
+    color: #1e293b;
+}
+
+.date-card-event {
+    font-size: 0.7rem;
+    color: #64748b;
+    margin-top: 0.2rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.date-card-count {
+    display: inline-block;
+    margin-top: 0.35rem;
+    padding: 0.1rem 0.4rem;
+    background: #f1f5f9;
+    border-radius: 10px;
+    font-size: 0.65rem;
+    color: #475569;
+}

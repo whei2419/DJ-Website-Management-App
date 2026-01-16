@@ -17,17 +17,34 @@ class DateController extends Controller
         return view('admin.dates.index', compact('dates'));
     }
     
-    public function list()
+    public function list(Request $request)
     {
-        $dates = Date::orderBy('date', 'asc')->get()->map(function ($date) {
+        $perPage = (int) $request->input('per_page', 20);
+        $search = $request->input('search');
+
+        $query = Date::query();
+
+        if (!empty($search)) {
+            $query->where('date', 'like', "%{$search}%");
+        }
+
+        $query->orderBy('date', 'asc');
+
+        $paginated = $query->paginate($perPage);
+
+        $data = $paginated->getCollection()->map(function ($date) {
             return [
                 'id' => $date->id,
                 'date' => $date->date->format('Y-m-d (l)'),
-                'actions' => view('admin.dates.partials.actions', ['date' => $date])->render(),
             ];
-        });
+        })->values();
 
-        return response()->json(['data' => $dates]);
+        return response()->json([
+            'draw' => (int) $request->input('draw', 1),
+            'recordsTotal' => $paginated->total(),
+            'recordsFiltered' => $paginated->total(),
+            'data' => $data,
+        ]);
     }
 
     /**
@@ -54,6 +71,19 @@ class DateController extends Controller
         }
 
         return redirect()->route('admin.dates.index')->with('success', 'Date created successfully.');
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Date $date)
+    {
+        return response()->json([
+            'date' => [
+                'id' => $date->id,
+                'date' => $date->date->format('Y-m-d'),
+            ],
+        ]);
     }
 
     /**

@@ -32,6 +32,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     
     // Admin DJ resource routes (omit separate create page — modal used)
+    Route::get('admin/djs/list', [AdminDJController::class, 'list'])->name('admin.djs.list');
     Route::get('admin/djs/available-dates', [AdminDJController::class, 'availableDates'])->name('admin.djs.available-dates');
     Route::resource('admin/djs', AdminDJController::class)->except(['create'])->names([
         'index' => 'admin.djs.index',
@@ -42,15 +43,16 @@ Route::middleware('auth')->group(function () {
     ]);
 
     // Admin Date resource routes (omit show, create pages — modal used)
+    //Admin dates for AJAX
+    Route::get('admin/dates/list', [AdminDateController::class, 'list'])->name('admin.dates.list');
+    Route::get('admin/dates/{date}/edit', [AdminDateController::class, 'edit'])->name('admin.dates.edit');
+    
     Route::resource('admin/dates', AdminDateController::class)->except(['show', 'create', 'edit'])->names([
         'index' => 'admin.dates.index',
         'store' => 'admin.dates.store',
         'update' => 'admin.dates.update',
         'destroy' => 'admin.dates.destroy',
     ]);
-
-    //Admin dates for AJAX
-    Route::get('admin/dates/list', [AdminDateController::class, 'list'])->name('admin.dates.list');
     // Admin DJs for AJAX (moved to API routes)
 });
 

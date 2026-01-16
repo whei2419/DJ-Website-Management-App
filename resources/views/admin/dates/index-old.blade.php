@@ -61,30 +61,18 @@
         {{-- Content start here --}}
         <div class="container-xl">
             <div class="page-body">
-                <div class="row row-deck row-cards w-100">
+                <div class="row row-deck row-cards">
                     <div class="col-12">
                         <div class="card">
                             <div class="card-table">
                                 <div class="card-header">
-                                    <div class="row align-items-center">
-                                        <div class="col-auto">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
                                             <h3 class="card-title mb-0">Event Dates</h3>
+                                            <p class="text-secondary m-0">Manage your event dates.</p>
                                         </div>
-                                        <div class="col-auto ms-auto">
-                                            <div class="d-flex align-items-center gap-2">
-                                                <div class="d-flex align-items-center">
-                                                    <span class="me-2">Show</span>
-                                                    <select id="datesTableLength" class="form-select form-select-sm" style="width: auto;">
-                                                        <option value="10">10</option>
-                                                        <option value="20" selected>20</option>
-                                                        <option value="50">50</option>
-                                                        <option value="100">100</option>
-                                                    </select>
-                                                    <span class="ms-2">entries</span>
-                                                </div>
-                                                <input type="text" id="datesTableSearch" class="form-control form-control-sm" placeholder="Search dates..." style="width: 250px;">
-                                                <a href="#" id="addOpen" class="btn btn-primary btn-sm d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#addDateModal"><i class="fas fa-plus me-2"></i> Add Date</a>
-                                            </div>
+                                        <div>
+                                            <a href="#" id="addOpen" class="btn btn-primary d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#addDateModal"><i class="fas fa-plus me-2"></i> Add Date</a>
                                         </div>
                                     </div>
                                 </div>

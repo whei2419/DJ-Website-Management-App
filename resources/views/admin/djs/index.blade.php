@@ -6,7 +6,7 @@
 
     <div class="page-wrapper">
         <div class="modal" id="addEditDJModal" tabindex="-1">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 id="DjTitle" class="modal-title"></h5>
@@ -51,140 +51,85 @@
             </div>
         </div>
     </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal modal-blur fade" id="deleteDJModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-status bg-danger"></div>
+                <div class="modal-body text-center py-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-danger icon-lg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 9v4" /><path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z" /><path d="M12 16h.01" /></svg>
+                    <h3>Are you sure?</h3>
+                    <div class="text-secondary">Do you really want to delete this DJ? This action cannot be undone.</div>
+                </div>
+                <div class="modal-footer">
+                    <div class="w-100">
+                        <div class="row">
+                            <div class="col">
+                                <button type="button" class="btn w-100" data-bs-dismiss="modal">Cancel</button>
+                            </div>
+                            <div class="col">
+                                <button type="button" id="confirmDeleteBtn" class="btn btn-danger w-100">Delete DJ</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
         {{-- Content start here --}}
         <div class="container-xl">
             <div class="page-body">
-                <div class="row row-deck row-cards">
+                <div class="row row-deck row-cards w-100">
                     <div class="col-12">
                         <div class="card">
                             <div class="card-table">
                                 <div class="card-header">
-                                    <div class="row w-full">
-                                        <div class="col">
+                                    <div class="row align-items-center">
+                                        <div class="col-auto">
                                             <h3 class="card-title mb-0">DJ table</h3>
-                                            <p class="text-secondary m-0">This table displays all DJs.</p>
                                         </div>
-                                        <div class="col-md-auto col-sm-12">
-                                            <div class="ms-auto d-flex flex-wrap btn-list">
-                                                <div class="input-group input-group-flat w-auto">
-                                                    <span class="input-group-text">
-                                                        <!-- Download SVG icon from http://tabler.io/icons/icon/search -->
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
-                                                            height="24" viewBox="0 0 24 24" fill="none"
-                                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                            stroke-linejoin="round" class="icon icon-1">
-                                                            <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"></path>
-                                                            <path d="M21 21l-6 -6"></path>
-                                                        </svg>
-                                                    </span>
-                                                    <input id="advanced-table-search" type="text" class="form-control"
-                                                        autocomplete="off">
-                                                    <span class="input-group-text">
-                                                        <kbd>ctrl + K</kbd>
-                                                    </span>
+                                        <div class="col-auto ms-auto">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="d-flex align-items-center">
+                                                    <span class="me-2">Show</span>
+                                                    <select id="djsTableLength" class="form-select form-select-sm" style="width: auto;">
+                                                        <option value="10">10</option>
+                                                        <option value="20" selected>20</option>
+                                                        <option value="50">50</option>
+                                                        <option value="100">100</option>
+                                                    </select>
+                                                    <span class="ms-2">entries</span>
                                                 </div>
-                                                <a href="#" id="addOpen" class="btn btn-primary btn-0 d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#addEditDJModal"><i class="fas fa-plus me-2"></i> Add Dj</a>
+                                                <input type="text" id="djsTableSearch" class="form-control form-control-sm" placeholder="Search DJs..." style="width: 250px;">
+                                                <a href="#" id="addOpen" class="btn btn-primary btn-sm d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#addEditDJModal"><i class="fas fa-plus me-2"></i> Add DJ</a>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div id="advanced-table"> 
                                     <div class="table-responsive">
-                                        <table class="table table-vcenter table-selectable">
+                                        <table id="djsTable" class="table table-vcenter">
                                             <thead>
                                                 <tr>
-                                                    <th class="w-1">ID</th>
+                                                    <th>ID</th>
                                                     <th>Video Preview</th>
-                                                    <th>
-                                                        <button class="table-sort d-flex justify-content-between"
-                                                            data-sort="sort-name">Name</button>
-                                                    </th>
-                                                    <th>
-                                                        <button class="table-sort d-flex justify-content-between"
-                                                            data-sort="sort-slot">Slot</button>
-                                                    </th>
+                                                    <th>Name</th>
+                                                    <th>Slot</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody class="table-tbody">
-                                                   <tr>
-                                                    <td>
-                                                        <input
-                                                            class="form-check-input m-0 align-middle table-selectable-check"
-                                                            type="checkbox" aria-label="Select invoice" value="true">
-                                                    </td>
-                                                    <td class="sort-name">
-                                                        <span class="avatar avatar-xs me-2"
-                                                            style="background-image: url(./static/avatars/008f.jpg)">
-                                                        </span>
-                                                        Tessie Curzon
-                                                    </td>
-                                                    <td class="sort-city">Hetang, China</td>
-                                                    <td class="sort-status">
-                                                        <span class="badge bg-danger-lt">Inactive</span>
-                                                    </td>
-                                                    <td class="sort-date">January 01, 2024</td>
-                                                    <td class="sort-tags">
-                                                        <div class="badges-list">
-                                                            <span class="badge">QTA</span>
-                                                            <span class="badge">Event</span>
-                                                        </div>
-                                                    </td>
-                                                    <td class="sort-category py-0">
-                                                        <span class="on-unchecked"> Agencies </span>
-                                                        <div class="on-checked">
-                                                            <div class="d-flex justify-content-end">
-                                                                <a href="#" class="btn btn-2 btn-icon"
-                                                                    aria-label="Button">
-                                                                    <!-- Download SVG icon from http://tabler.io/icons/icon/dots -->
-                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24"
-                                                                        height="24" viewBox="0 0 24 24" fill="none"
-                                                                        stroke="currentColor" stroke-width="2"
-                                                                        stroke-linecap="round" stroke-linejoin="round"
-                                                                        class="icon icon-2">
-                                                                        <path d="M5 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0">
-                                                                        </path>
-                                                                        <path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0">
-                                                                        </path>
-                                                                        <path d="M19 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0">
-                                                                        </path>
-                                                                    </svg>
-                                                                </a>
-                                                            </div>
-                                                        </div>
+                                                <tr>
+                                                    <td colspan="5" class="text-center py-4">
+                                                        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                                                        <span class="text-muted">Loading DJs...</span>
                                                     </td>
                                                 </tr>
                                             </tbody>
                                         </table>
-                                    </div>
-                                    <div class="card-footer d-flex align-items-center">
-                                        <div class="dropdown">
-                                            <a class="btn dropdown-toggle" data-bs-toggle="dropdown"
-                                                aria-expanded="false">
-                                                <span id="page-count" class="me-1">20</span>
-                                                <span>records</span>
-                                            </a>
-                                            <div class="dropdown-menu" style="">
-                                                <a class="dropdown-item" onclick="setPageListItems(event)"
-                                                    data-value="10">10 records</a>
-                                                <a class="dropdown-item" onclick="setPageListItems(event)"
-                                                    data-value="20">20 records</a>
-                                                <a class="dropdown-item" onclick="setPageListItems(event)"
-                                                    data-value="50">50 records</a>
-                                                <a class="dropdown-item" onclick="setPageListItems(event)"
-                                                    data-value="100">100 records</a>
-                                            </div>
-                                        </div>
-                                        <ul class="pagination m-0 ms-auto">
-                                            <li class="page-item active"><a class="page-link cursor-pointer"
-                                                    data-i="1" data-page="20">1</a></li>
-                                            <li class="page-item"><a class="page-link cursor-pointer" data-i="2"
-                                                    data-page="20">2</a></li>
-                                            <li class="page-item disabled"><a class="page-link cursor-pointer">...</a>
-                                            </li>
-                                            <li class="page-item"><a class="page-link cursor-pointer" data-i="7"
-                                                    data-page="20">7</a></li>
-                                        </ul>
                                     </div>
                                 </div>
                             </div>
@@ -198,64 +143,14 @@
 @endsection
 
 @push('scripts')
-    <style>
-        .date-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 0.5rem;
-            max-height: 300px;
-            overflow-y: auto;
-            padding: 0.5rem;
-            border: 1px solid #e6e7e9;
-            border-radius: 4px;
-        }
-        .date-card {
-            border: 2px solid #e6e7e9;
-            border-radius: 4px;
-            padding: 0.5rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            background: #fff;
-        }
-        .date-card:hover {
-            border-color: #206bc4;
-            box-shadow: 0 2px 8px rgba(32, 107, 196, 0.1);
-        }
-        .date-card.selected {
-            border-color: #206bc4;
-            background: #e8f3fd;
-        }
-        .date-card-date {
-            font-weight: 600;
-            font-size: 0.75rem;
-            color: #1e293b;
-        }
-        .date-card-event {
-            font-size: 0.7rem;
-            color: #64748b;
-            margin-top: 0.2rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .date-card-count {
-            display: inline-block;
-            margin-top: 0.35rem;
-            padding: 0.1rem 0.4rem;
-            background: #f1f5f9;
-            border-radius: 10px;
-            font-size: 0.65rem;
-            color: #475569;
-        }
-        .date-card.selected .date-card-count {
-            background: #206bc4;
-            color: #fff;
-        }
-    </style>
-    <script>
-        const djsDataRoute = "{{ route('admin.djs.list') }}";
-        const saveDJRoute = "{{ route('admin.djs.store') }}";
-        const availableDatesRoute = "{{ route('admin.djs.available-dates') }}";
-    </script>
-    @vite(['resources/js/admin-djs-custom.js'])
+<!-- DataTables -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+<script>
+    const djsDataRoute = "{{ route('admin.djs.list') }}";
+    const saveDJRoute = "{{ route('admin.djs.store') }}";
+    const availableDatesRoute = "{{ route('admin.djs.available-dates') }}";
+</script>
+@vite(['resources/sass/admin/_tables.scss', 'resources/js/admin-djs-datatables.js'])
 @endpush

@@ -84,13 +84,10 @@ class DJController extends Controller
             })->values();
 
             return response()->json([
+                'draw' => (int) $request->input('draw', 1),
+                'recordsTotal' => $paginated->total(),
+                'recordsFiltered' => $paginated->total(),
                 'data' => $data,
-                'meta' => [
-                    'total' => $paginated->total(),
-                    'per_page' => $paginated->perPage(),
-                    'current_page' => $paginated->currentPage(),
-                    'last_page' => $paginated->lastPage(),
-                ],
             ]);
         } catch (\Throwable $e) {
             return response()->json([
@@ -123,7 +120,7 @@ class DJController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'slot' => 'required|string|max:255',
-            'video' => 'required|file|mimetypes:video/mp4,video/quicktime,video/x-msvideo,video/x-ms-wmv,video/webm|max:200000',
+            'video' => 'required|file|mimetypes:video/mp4,video/quicktime,video/x-msvideo,video/x-ms-wmv,video/webm,video/x-matroska|max:512000', // 500MB
         ]);
 
         $data = $request->only(['name', 'slot']);
@@ -162,6 +159,12 @@ class DJController extends Controller
     public function edit(string $id)
     {
         $dj = DJ::findOrFail($id);
+        
+        // Return JSON for AJAX requests
+        if (request()->wantsJson() || request()->expectsJson()) {
+            return response()->json(['dj' => $dj]);
+        }
+        
         return view('admin.djs.edit', compact('dj'));
     }
 
@@ -208,7 +211,29 @@ class DJController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            $dj = DJ::findOrFail($id);
+            
+            // Delete video file if exists
+            if ($dj->video_path && Storage::disk('public')->exists($dj->video_path)) {
+                Storage::disk('public')->delete($dj->video_path);
+            }
+            
+            $dj->delete();
+            
+            // Return JSON for AJAX requests
+            if (request()->wantsJson() || request()->expectsJson()) {
+                return response()->json(['success' => true, 'message' => 'DJ deleted successfully']);
+            }
+            
+            return redirect()->route('admin.djs.index')->with('success', 'DJ deleted successfully.');
+        } catch (\Throwable $e) {
+            if (request()->wantsJson() || request()->expectsJson()) {
+                return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            }
+            
+            return redirect()->route('admin.djs.index')->with('error', 'Failed to delete DJ.');
+        }
     }
 
     /**
