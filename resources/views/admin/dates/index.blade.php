@@ -126,5 +126,5 @@
     const datesDataRoute = "{{ route('admin.dates.list') }}";
     const saveDateRoute = "{{ route('admin.dates.store') }}";
 </script>
-@vite(['resources/sass/admin/_tables.scss', 'resources/js/admin-dates-datatables.js'])
+@vite(['resources/js/admin-dates-datatables.js'])
 @endpush

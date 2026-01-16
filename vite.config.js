@@ -10,6 +10,8 @@ export default defineConfig({
                 'resources/js/site.js',
                 'resources/sass/site.scss', // Site entry point
                 'resources/js/admin-dates.js', // Admin dates page
+                'resources/js/admin-dates-datatables.js', // DataTables for dates
+                'resources/js/admin-djs-datatables.js', // DataTables for DJs
             ],
             refresh: true,
         }),

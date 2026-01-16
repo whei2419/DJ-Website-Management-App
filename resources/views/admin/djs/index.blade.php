@@ -152,5 +152,5 @@
     const saveDJRoute = "{{ route('admin.djs.store') }}";
     const availableDatesRoute = "{{ route('admin.djs.available-dates') }}";
 </script>
-@vite(['resources/sass/admin/_tables.scss', 'resources/js/admin-djs-datatables.js'])
+@vite(['resources/js/admin-djs-datatables.js'])
 @endpush

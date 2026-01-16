@@ -1,1 +1,296 @@
 @use 'admin-dashboard';
+
+/* DataTables Custom Styling for Admin Tables */
+
+// Wrapper styling
+.dataTables_wrapper {
+    // Bottom row (info and pagination)
+    .row {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid #e6e7e9;
+        margin: 0;
+    }
+
+    // Info text (Showing X to Y of Z entries)
+    .dataTables_info {
+        padding-top: 0.5rem;
+    }
+
+    // Pagination
+    .dataTables_paginate {
+        text-align: right;
+        padding-top: 0.5rem;
+
+        .pagination {
+            margin: 0;
+        }
+    }
+}
+
+// Date grid styling (for DJ page date selector)
+.date-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.5rem;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 0.5rem;
+    border: 1px solid #e6e7e9;
+    border-radius: 4px;
+}
+
+.date-card {
+    border: 2px solid #e6e7e9;
+    border-radius: 4px;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #fff;
+
+    &:hover {
+        border-color: #F29F67;
+        box-shadow: 0 2px 8px rgba(242, 159, 103, 0.1);
+    }
+
+    &.selected {
+        border-color: #F29F67;
+        background: #fef3ec;
+
+        .date-card-count {
+            background: #F29F67;
+            color: #fff;
+        }
+    }
+}
+
+.date-card-date {
+    font-weight: 600;
+    font-size: 0.75rem;
+    color: #1e293b;
+}
+
+.date-card-event {
+    font-size: 0.7rem;
+    color: #64748b;
+    margin-top: 0.2rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.date-card-count {
+    display: inline-block;
+    margin-top: 0.35rem;
+    padding: 0.1rem 0.4rem;
+    background: #f1f5f9;
+    border-radius: 10px;
+    font-size: 0.65rem;
+    color: #475569;
+}
+
+// Custom Color Theme Override
+:root {
+  // Primary Colors
+  --tblr-primary: #F29F67;
+  --tblr-primary-rgb: 242, 159, 103;
+  --tblr-primary-darken: #e88648;
+  --tblr-primary-lighten: #f5b286;
+  
+  --tblr-secondary: #1E1E2C;
+  --tblr-secondary-rgb: 30, 30, 44;
+  
+  // Supporting Colors
+  --tblr-info: #3B8FF3;
+  --tblr-info-rgb: 59, 143, 243;
+  
+  --tblr-success: #34B1AA;
+  --tblr-success-rgb: 52, 177, 170;
+  
+  --tblr-warning: #E0B50F;
+  --tblr-warning-rgb: 224, 181, 15;
+  
+  --tblr-danger: #dc3545;
+  --tblr-danger-rgb: 220, 53, 69;
+  
+  // Button colors
+  --tblr-btn-primary-bg: #F29F67;
+  --tblr-btn-primary-border-color: #F29F67;
+  
+  // Link colors
+  --tblr-link-color: #F29F67;
+  --tblr-link-hover-color: #e88648;
+}
+
+// Background colors
+.bg-primary { background-color: #F29F67 !important; }
+.bg-info { background-color: #3B8FF3 !important; }
+.bg-success { background-color: #34B1AA !important; }
+.bg-warning { background-color: #E0B50F !important; }
+.bg-secondary { background-color: #1E1E2C !important; }
+
+.bg-blue { background-color: #3B8FF3 !important; }
+.bg-teal { background-color: #34B1AA !important; }
+.bg-orange { background-color: #F29F67 !important; }
+.bg-yellow { background-color: #E0B50F !important; }
+
+// Text colors
+.text-primary { color: #F29F67 !important; }
+.text-info { color: #3B8FF3 !important; }
+.text-success { color: #34B1AA !important; }
+.text-warning { color: #E0B50F !important; }
+.text-blue { color: #3B8FF3 !important; }
+.text-teal { color: #34B1AA !important; }
+.text-orange { color: #F29F67 !important; }
+
+// Primary Button
+.btn-primary {
+  background-color: #F29F67;
+  border-color: #F29F67;
+  color: #fff;
+  
+  &:hover, &:focus, &:active {
+    background-color: #e88648;
+    border-color: #e88648;
+    color: #fff;
+  }
+  
+  &:not(:disabled):not(.disabled):active,
+  &:not(:disabled):not(.disabled).active {
+    background-color: #d77a39;
+    border-color: #d77a39;
+  }
+}
+
+// Info Button
+.btn-info {
+  background-color: #3B8FF3;
+  border-color: #3B8FF3;
+  color: #fff;
+  
+  &:hover, &:focus, &:active {
+    background-color: #2179e8;
+    border-color: #2179e8;
+    color: #fff;
+  }
+}
+
+// Success Button
+.btn-success {
+  background-color: #34B1AA;
+  border-color: #34B1AA;
+  color: #fff;
+  
+  &:hover, &:focus, &:active {
+    background-color: #2a9691;
+    border-color: #2a9691;
+    color: #fff;
+  }
+}
+
+// Warning Button
+.btn-warning {
+  background-color: #E0B50F;
+  border-color: #E0B50F;
+  color: #fff;
+  
+  &:hover, &:focus, &:active {
+    background-color: #c59d0c;
+    border-color: #c59d0c;
+    color: #fff;
+  }
+}
+
+// Outline Buttons
+.btn-outline-primary {
+  color: #F29F67;
+  border-color: #F29F67;
+  
+  &:hover, &:focus, &:active {
+    background-color: #F29F67;
+    border-color: #F29F67;
+    color: #fff;
+  }
+}
+
+.btn-outline-info {
+  color: #3B8FF3;
+  border-color: #3B8FF3;
+  
+  &:hover, &:focus, &:active {
+    background-color: #3B8FF3;
+    border-color: #3B8FF3;
+    color: #fff;
+  }
+}
+
+.btn-outline-success {
+  color: #34B1AA;
+  border-color: #34B1AA;
+  
+  &:hover, &:focus, &:active {
+    background-color: #34B1AA;
+    border-color: #34B1AA;
+    color: #fff;
+  }
+}
+
+// Badge colors
+.badge-outline.text-blue,
+.badge.bg-blue {
+  background-color: #3B8FF3;
+  color: #fff;
+}
+
+.badge-outline.text-primary {
+  border-color: #F29F67;
+  color: #F29F67;
+}
+
+// Links
+a {
+  color: #F29F67;
+  
+  &:hover {
+    color: #e88648;
+  }
+}
+
+// Card elements with colored backgrounds
+.avatar[style*="background-color: #206bc4"] {
+  background-color: #3B8FF3 !important;
+}
+
+.avatar[style*="background-color: #d63939"] {
+  background-color: #E0B50F !important;
+}
+
+// Form controls focus state
+.form-control:focus,
+.form-select:focus {
+  border-color: #F29F67;
+  box-shadow: 0 0 0 0.25rem rgba(242, 159, 103, 0.25);
+}
+
+// Dropdown active item
+.dropdown-item:hover,
+.dropdown-item:focus,
+.dropdown-item.active {
+  background-color: #f5b286;
+  color: #1E1E2C;
+}
+
+// Pagination
+.page-link {
+  color: #F29F67;
+  
+  &:hover {
+    color: #e88648;
+    background-color: #f5b286;
+    border-color: #F29F67;
+  }
+}
+
+.page-item.active .page-link {
+  background-color: #F29F67;
+  border-color: #F29F67;
+}
