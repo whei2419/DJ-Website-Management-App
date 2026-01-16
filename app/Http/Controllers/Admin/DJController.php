@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\DJ;
 use Illuminate\Support\Facades\Storage;
+use App\Services\VideoPreviewService;
 
 class DJController extends Controller
 {
@@ -70,13 +71,26 @@ class DJController extends Controller
             $paginated = $query->paginate($perPage);
 
             $data = $paginated->getCollection()->map(function ($dj) {
-                $videoPreview = $dj->video_path
-                    ? (Storage::disk('public')->exists($dj->video_path) ? Storage::disk('public')->url($dj->video_path) : null)
-                    : ($dj->video_url ?? null);
+                // Prefer preview video over original for performance
+                $videoPreview = null;
+                $posterUrl = null;
+
+                if ($dj->preview_video_path && Storage::disk('public')->exists($dj->preview_video_path)) {
+                    $videoPreview = Storage::disk('public')->url($dj->preview_video_path);
+                } elseif ($dj->video_path && Storage::disk('public')->exists($dj->video_path)) {
+                    $videoPreview = Storage::disk('public')->url($dj->video_path);
+                } elseif ($dj->video_url) {
+                    $videoPreview = $dj->video_url;
+                }
+
+                if ($dj->poster_path && Storage::disk('public')->exists($dj->poster_path)) {
+                    $posterUrl = Storage::disk('public')->url($dj->poster_path);
+                }
 
                 return [
                     'id' => $dj->id,
                     'video_preview' => $videoPreview,
+                    'poster' => $posterUrl,
                     'name' => $dj->name,
                     'slot' => $dj->slot ?? '-',
                     'actions' => view('admin.djs.partials.actions', ['dj' => $dj])->render(),
@@ -129,6 +143,18 @@ class DJController extends Controller
             $file = $request->file('video');
             $path = $file->store('djs', 'public');
             $data['video_path'] = $path;
+
+            // Generate preview video and poster
+            $videoService = new VideoPreviewService();
+            $previewPath = $videoService->generatePreview($path);
+            $posterPath = $videoService->generatePoster($path);
+
+            if ($previewPath) {
+                $data['preview_video_path'] = $previewPath;
+            }
+            if ($posterPath) {
+                $data['poster_path'] = $posterPath;
+            }
         }
 
         if ($request->filled('video_url')) {
@@ -188,13 +214,30 @@ class DJController extends Controller
         }
 
         if ($request->hasFile('video')) {
-            // delete previous file if exists
+            // delete previous files if exists
             if ($dj->video_path && Storage::disk('public')->exists($dj->video_path)) {
                 Storage::disk('public')->delete($dj->video_path);
+                
+                // Delete preview files
+                $videoService = new VideoPreviewService();
+                $videoService->deletePreviewFiles($dj->video_path);
             }
+            
             $file = $request->file('video');
             $path = $file->store('djs', 'public');
             $data['video_path'] = $path;
+
+            // Generate new preview video and poster
+            $videoService = new VideoPreviewService();
+            $previewPath = $videoService->generatePreview($path);
+            $posterPath = $videoService->generatePoster($path);
+
+            if ($previewPath) {
+                $data['preview_video_path'] = $previewPath;
+            }
+            if ($posterPath) {
+                $data['poster_path'] = $posterPath;
+            }
         }
 
         if ($request->filled('video_url')) {
@@ -217,6 +260,10 @@ class DJController extends Controller
             // Delete video file if exists
             if ($dj->video_path && Storage::disk('public')->exists($dj->video_path)) {
                 Storage::disk('public')->delete($dj->video_path);
+                
+                // Delete preview files
+                $videoService = new VideoPreviewService();
+                $videoService->deletePreviewFiles($dj->video_path);
             }
             
             $dj->delete();

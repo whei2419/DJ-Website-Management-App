@@ -14,6 +14,8 @@ class DJ extends Model
         'slot',
         'video_url',
         'video_path',
+        'preview_video_path',
+        'poster_path',
     ];
 
     public function dates()

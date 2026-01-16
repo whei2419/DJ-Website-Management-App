@@ -1,0 +1,182 @@
+<?php
+
+namespace App\Services;
+
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
+use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+
+class VideoPreviewService
+{
+    /**
+     * Generate a thumbnail/preview video from the original video
+     * Creates a smaller, lower quality version for preview purposes
+     *
+     * @param string $videoPath Original video path in storage
+     * @return string|null Preview video path or null if generation fails
+     */
+    public function generatePreview(string $videoPath): ?string
+    {
+        try {
+            // Check if FFmpeg is available
+            if (!$this->isFfmpegAvailable()) {
+                Log::warning('FFmpeg not available, skipping video preview generation');
+                return null;
+            }
+
+            $fullPath = Storage::disk('public')->path($videoPath);
+            
+            // Generate preview path
+            $pathInfo = pathinfo($videoPath);
+            $previewPath = $pathInfo['dirname'] . '/' . $pathInfo['filename'] . '_preview.' . $pathInfo['extension'];
+            $previewFullPath = Storage::disk('public')->path($previewPath);
+
+            // Ensure directory exists
+            $previewDir = dirname($previewFullPath);
+            if (!is_dir($previewDir)) {
+                mkdir($previewDir, 0755, true);
+            }
+
+            // FFmpeg command to create a smaller, lower quality preview
+            // - Scale to max width of 400px (maintains aspect ratio)
+            // - Lower bitrate (500k for video)
+            // - Lower audio bitrate (64k)
+            // - Fast encoding preset
+            $process = new Process([
+                'ffmpeg',
+                '-i', $fullPath,
+                '-vf', 'scale=400:-2',  // Scale to 400px width, maintain aspect ratio
+                '-b:v', '500k',          // Video bitrate 500 kbps
+                '-b:a', '64k',           // Audio bitrate 64 kbps
+                '-preset', 'fast',       // Fast encoding
+                '-movflags', '+faststart', // Enable streaming
+                '-y',                    // Overwrite output file
+                $previewFullPath
+            ]);
+
+            $process->setTimeout(300); // 5 minutes timeout
+            $process->run();
+
+            if (!$process->isSuccessful()) {
+                Log::error('FFmpeg preview generation failed', [
+                    'error' => $process->getErrorOutput(),
+                    'video_path' => $videoPath
+                ]);
+                return null;
+            }
+
+            return $previewPath;
+
+        } catch (\Exception $e) {
+            Log::error('Video preview generation failed', [
+                'error' => $e->getMessage(),
+                'video_path' => $videoPath
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * Generate a poster/thumbnail image from the video
+     *
+     * @param string $videoPath Original video path in storage
+     * @return string|null Poster image path or null if generation fails
+     */
+    public function generatePoster(string $videoPath): ?string
+    {
+        try {
+            if (!$this->isFfmpegAvailable()) {
+                return null;
+            }
+
+            $fullPath = Storage::disk('public')->path($videoPath);
+            
+            $pathInfo = pathinfo($videoPath);
+            $posterPath = $pathInfo['dirname'] . '/' . $pathInfo['filename'] . '_poster.jpg';
+            $posterFullPath = Storage::disk('public')->path($posterPath);
+
+            // Ensure directory exists
+            $posterDir = dirname($posterFullPath);
+            if (!is_dir($posterDir)) {
+                mkdir($posterDir, 0755, true);
+            }
+
+            // Extract frame at 1 second
+            $process = new Process([
+                'ffmpeg',
+                '-i', $fullPath,
+                '-ss', '00:00:01',       // Seek to 1 second
+                '-vframes', '1',         // Extract 1 frame
+                '-vf', 'scale=400:-2',   // Scale to 400px width
+                '-q:v', '2',             // High quality JPEG
+                '-y',
+                $posterFullPath
+            ]);
+
+            $process->setTimeout(60);
+            $process->run();
+
+            if (!$process->isSuccessful()) {
+                Log::error('Poster generation failed', [
+                    'error' => $process->getErrorOutput(),
+                    'video_path' => $videoPath
+                ]);
+                return null;
+            }
+
+            return $posterPath;
+
+        } catch (\Exception $e) {
+            Log::error('Poster generation failed', [
+                'error' => $e->getMessage(),
+                'video_path' => $videoPath
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * Check if FFmpeg is available on the system
+     *
+     * @return bool
+     */
+    private function isFfmpegAvailable(): bool
+    {
+        try {
+            $process = new Process(['ffmpeg', '-version']);
+            $process->run();
+            return $process->isSuccessful();
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Delete preview and poster files when video is deleted
+     *
+     * @param string $videoPath
+     * @return void
+     */
+    public function deletePreviewFiles(string $videoPath): void
+    {
+        try {
+            $pathInfo = pathinfo($videoPath);
+            $previewPath = $pathInfo['dirname'] . '/' . $pathInfo['filename'] . '_preview.' . $pathInfo['extension'];
+            $posterPath = $pathInfo['dirname'] . '/' . $pathInfo['filename'] . '_poster.jpg';
+
+            if (Storage::disk('public')->exists($previewPath)) {
+                Storage::disk('public')->delete($previewPath);
+            }
+
+            if (Storage::disk('public')->exists($posterPath)) {
+                Storage::disk('public')->delete($posterPath);
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to delete preview files', [
+                'error' => $e->getMessage(),
+                'video_path' => $videoPath
+            ]);
+        }
+    }
+}

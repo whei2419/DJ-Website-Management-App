@@ -37,13 +37,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     searchable: false,
                     render: function(data, type, row) {
                         if (data) {
+                            const poster = row.poster ? `poster="${row.poster}"` : '';
+                            const videoId = `video-${row.id}`;
                             return `<div style="position: relative; width: 100px; height: 75px; border-radius: 4px; overflow: hidden;">
-                                <video style="width: 100%; height: 100%; object-fit: cover;" preload="metadata">
+                                <video id="${videoId}" 
+                                       style="width: 100%; height: 100%; object-fit: cover;" 
+                                       preload="auto"
+                                       ${poster}
+                                       autoplay
+                                       muted 
+                                       loop 
+                                       playsinline>
                                     <source src="${data}" type="video/webm">
+                                    <source src="${data}" type="video/mp4">
                                 </video>
-                                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; opacity: 0.9;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                                </div>
                             </div>`;
                         }
                         return '<span class="avatar avatar-sm" style="background-color: var(--tblr-muted-bg);"><i class="fas fa-video text-muted"></i></span>';
@@ -359,8 +366,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showToast(title, message, type) {
-        if (window.adminToaster) {
-            window.adminToaster(title, message, type);
+        if (window.adminToaster && window.adminToaster.show) {
+            window.adminToaster.show(type, message);
         }
     };
 
@@ -431,3 +438,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 });
+
+// Video preview play/pause functions
+window.playVideo = function(videoId) {
+    const video = document.getElementById(videoId);
+    if (video) {
+        video.play().catch(err => {
+            console.log('Video autoplay prevented:', err);
+        });
+    }
+};
+
+window.pauseVideo = function(videoId) {
+    const video = document.getElementById(videoId);
+    if (video) {
+        video.pause();
+        video.currentTime = 0; // Reset to beginning
+    }
+};

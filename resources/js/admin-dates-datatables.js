@@ -214,8 +214,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showToast(title, message, type) {
-        if (window.adminToaster) {
-            window.adminToaster(title, message, type);
+        if (window.adminToaster && window.adminToaster.show) {
+            window.adminToaster.show(type, message);
         }
     }
 
