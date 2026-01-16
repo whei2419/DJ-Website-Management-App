@@ -114,6 +114,54 @@ if (document.readyState === 'loading') {
 	initNavScroll();
 }
 
+// Mobile menu toggle
+function initMobileMenu() {
+	const toggle = document.querySelector('.mobile-menu-toggle');
+	const navBottom = document.querySelector('.nav-bottom');
+	
+	if (!toggle || !navBottom) return;
+	
+	toggle.addEventListener('click', function() {
+		const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+		toggle.setAttribute('aria-expanded', !isExpanded);
+		navBottom.classList.toggle('active');
+		
+		// Prevent body scroll when menu is open
+		if (!isExpanded) {
+			document.body.style.overflow = 'hidden';
+		} else {
+			document.body.style.overflow = '';
+		}
+	});
+	
+	// Close menu when clicking nav links
+	const navLinks = navBottom.querySelectorAll('a');
+	navLinks.forEach(link => {
+		link.addEventListener('click', function() {
+			if (window.innerWidth <= 768) {
+				toggle.setAttribute('aria-expanded', 'false');
+				navBottom.classList.remove('active');
+				document.body.style.overflow = '';
+			}
+		});
+	});
+	
+	// Close menu on window resize if switching to desktop
+	window.addEventListener('resize', function() {
+		if (window.innerWidth > 768) {
+			toggle.setAttribute('aria-expanded', 'false');
+			navBottom.classList.remove('active');
+			document.body.style.overflow = '';
+		}
+	});
+}
+
+if (document.readyState === 'loading') {
+	document.addEventListener('DOMContentLoaded', initMobileMenu);
+} else {
+	initMobileMenu();
+}
+
 // GSAP ScrollTrigger animations (hero and reveal elements)
 function initGsapScroll() {
 	// hero video parallax via GSAP ScrollTrigger (non-destructive if video exists)

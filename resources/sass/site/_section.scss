@@ -24,20 +24,12 @@
 .section-white {
     position: relative;
     background-color: #ffffff;
-    color: #1e293b;
-    text-align: center;
-    height: 100vh;
 
-    .section-title {
-        font-size: 2.5rem;
-        font-weight: 700;
-        margin-bottom: 1rem;
+    img {
+        width: 15vw;
+        height: auto;
+        object-fit: contain;
+        margin: auto auto;
     }
-
-    .section-text {
-        font-size: 1.125rem;
-        line-height: 1.75rem;
-        max-width: 600px;
-        margin: 0 auto;
-    }
+ 
 }

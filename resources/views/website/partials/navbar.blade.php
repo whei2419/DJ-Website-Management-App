@@ -2,10 +2,15 @@
 
 <div class="nav-container">
     <div class="container-fluid p-0 m-0 ">
-        <div class="logo-container">
-            <a href="{{ route('site.index') }}" class="logo-link">
-                <img src="{{ asset('assets/images/logo.webp') }}" alt="Logo" class="logo-image">
-            </a>
+        <div class="nav-header">
+            <div class="logo-container">
+                <a href="{{ route('site.index') }}" class="logo-link">
+                    <img src="{{ asset('assets/images/logo.webp') }}" alt="Logo" class="logo-image">
+                </a>
+            </div>
+            <button class="mobile-menu-toggle" aria-label="Toggle menu" aria-expanded="false">
+                <span class="hamburger-icon"></span>
+            </button>
         </div>
         <div class="nav-bottom">
             <ul>
