@@ -33,7 +33,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 { 
                     data: 'date',
                     render: function(data) {
-                        return `<span class="badge bg-primary">${data}</span>`;
+                        if (!data) return '';
+                        return `<span class="d-inline-flex align-items-center border border-primary text-primary rounded-1 px-2 py-1" style="font-size:0.95rem;">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            <span>${data}</span>
+                        </span>`;
                     }
                 },
                 { 

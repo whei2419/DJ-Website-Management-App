@@ -1,12 +1,12 @@
 // Gallery page styles
 .gallery-page {
     background-color: #000000;
-    min-height: 100vh;
     color: #ffffff;
 
     .brand-container {
         padding: 3rem 0;
         text-align: center;
+        height: 50vh;
 
         .logo-image {
             max-width: 300px;
@@ -17,7 +17,6 @@
 
     .gallery-section {
         padding: 2rem 0 4rem;
-        min-height: 800px;
 
         h1 {
             text-align: center;

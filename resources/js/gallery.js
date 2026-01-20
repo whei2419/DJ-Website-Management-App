@@ -4,6 +4,10 @@ console.log('gallery.js loaded');
 let dates = [];
 let currentDateIndex = 0;
 let currentDate = null;
+let currentCardIndex = 0;
+let cardWidth = 0;
+let autoAdvanceInterval = null;
+const AUTO_ADVANCE_MS = 4000;
 
 // Initialize gallery on page load
 document.addEventListener('DOMContentLoaded', function () {
@@ -147,16 +151,211 @@ function displayDJs(djs) {
 
     // Clear existing content
     galleryContent.innerHTML = '';
+    currentCardIndex = 0;
 
     if (djs.length === 0) {
         galleryContent.innerHTML = '<p class="no-data">More videos will be uploaded soon</p>';
         return;
     }
 
-    // Create card for each DJ
+    // Create card for each DJ inside the carousel track
     djs.forEach((dj, index) => {
         const card = createDJCard(dj, index);
+        // ensure cards have consistent sizing for carousel
+        card.style.minWidth = '320px';
+        card.style.flex = '0 0 auto';
         galleryContent.appendChild(card);
+    });
+
+    // Initialize carousel controls
+    setupCarouselControls();
+    // try to autoplay visible videos
+    try { playVisibleCards(); } catch (e) { /* ignore */ }
+
+    // start/stop autoplay and show/hide arrows based on card count
+    const track = document.querySelector('.carousel-track');
+    const count = track ? track.querySelectorAll('.card').length : 0;
+    if (count > 1) startAutoAdvance(); else stopAutoAdvance();
+    const prevBtn = document.querySelector('.cards-arrow.left');
+    const nextBtn = document.querySelector('.cards-arrow.right');
+    if (prevBtn) prevBtn.style.display = count > 1 ? 'flex' : 'none';
+    if (nextBtn) nextBtn.style.display = count > 1 ? 'flex' : 'none';
+}
+
+function setupCarouselControls() {
+    const viewport = document.querySelector('.carousel-viewport');
+    const track = document.querySelector('.carousel-track');
+    const prevBtn = document.querySelector('.cards-arrow.left');
+    const nextBtn = document.querySelector('.cards-arrow.right');
+
+    if (!track || !viewport) return;
+
+    // compute card width (use first card)
+    const firstCard = track.querySelector('.card');
+    cardWidth = firstCard ? firstCard.getBoundingClientRect().width : viewport.getBoundingClientRect().width;
+
+    // apply track styles
+    track.style.display = 'flex';
+    track.style.transition = 'transform 300ms ease';
+
+    const update = () => {
+        const cards = track.querySelectorAll('.card');
+        if (!cards.length) return;
+        cardWidth = cards[0].getBoundingClientRect().width;
+        moveToCard(currentCardIndex);
+    };
+
+    window.addEventListener('resize', update);
+
+    if (prevBtn) prevBtn.addEventListener('click', () => prevCard());
+    if (nextBtn) nextBtn.addEventListener('click', () => nextCard());
+
+    // enable swipe for touch devices
+    let startX = 0;
+    let isTouch = false;
+    track.addEventListener('touchstart', (e) => {
+        isTouch = true;
+        startX = e.touches[0].clientX;
+    });
+    track.addEventListener('touchend', (e) => {
+        if (!isTouch) return;
+        const diff = startX - (e.changedTouches[0].clientX || 0);
+        if (Math.abs(diff) > 50) {
+            if (diff > 0) nextCard(); else prevCard();
+        }
+        isTouch = false;
+    });
+    // pause autoplay on hover over viewport/track
+    const viewportEl = document.querySelector('.carousel-viewport');
+    if (viewportEl) {
+        viewportEl.addEventListener('mouseenter', () => stopAutoAdvance());
+        viewportEl.addEventListener('mouseleave', () => startAutoAdvance());
+    }
+}
+
+function moveToCard(index) {
+    const track = document.querySelector('.carousel-track');
+    if (!track) return;
+    const cards = track.querySelectorAll('.card');
+    if (!cards.length) return;
+    // clamp index
+    currentCardIndex = Math.max(0, Math.min(index, cards.length - 1));
+    // compute offset to align the requested card to the left edge of the viewport
+    const viewport = document.querySelector('.carousel-viewport');
+    const vpStyle = viewport ? window.getComputedStyle(viewport) : null;
+    const padLeft = vpStyle ? parseFloat(vpStyle.paddingLeft || 0) : 0;
+    const card = cards[currentCardIndex];
+    const offset = (card && typeof card.offsetLeft === 'number') ? (card.offsetLeft - padLeft) : (currentCardIndex * cardWidth);
+    track.style.transform = `translateX(-${offset}px)`;
+    // attempt to play visible cards after moving
+    try { playVisibleCards(); } catch (e) { /* ignore */ }
+}
+
+function nextCard() {
+    const track = document.querySelector('.carousel-track');
+    if (!track) return;
+    const count = track.querySelectorAll('.card').length;
+    const { firstVisible, lastVisible } = getVisibleIndices();
+    // if everything fits already, do nothing
+    if (firstVisible === 0 && lastVisible === count - 1) return;
+    if (lastVisible < count - 1) {
+        moveToCard(lastVisible + 1);
+    } else {
+        moveToCard(0);
+    }
+    resetAutoAdvance();
+}
+
+function prevCard() {
+    const track = document.querySelector('.carousel-track');
+    if (!track) return;
+    const count = track.querySelectorAll('.card').length;
+    const { firstVisible, lastVisible } = getVisibleIndices();
+    // if everything fits already, do nothing
+    if (firstVisible === 0 && lastVisible === count - 1) return;
+    if (firstVisible > 0) {
+        moveToCard(firstVisible - 1);
+    } else {
+        moveToCard(count - 1);
+    }
+    resetAutoAdvance();
+}
+
+function getVisibleIndices() {
+    const track = document.querySelector('.carousel-track');
+    const viewport = document.querySelector('.carousel-viewport');
+    const result = { firstVisible: 0, lastVisible: 0 };
+    if (!track || !viewport) return result;
+    const cards = track.querySelectorAll('.card');
+    if (!cards.length) return result;
+    const vpRect = viewport.getBoundingClientRect();
+
+    let first = null;
+    let last = null;
+    cards.forEach((card, i) => {
+        const r = card.getBoundingClientRect();
+        // consider a card fully visible if its whole width fits inside the viewport (with small tolerance)
+        const fullyVisible = (r.left >= vpRect.left + 2 && r.right <= vpRect.right - 2);
+        if (fullyVisible) {
+            if (first === null) first = i;
+            last = i;
+        }
+    });
+
+    if (first === null) {
+        // no fully visible cards — pick the first partially visible range
+        cards.forEach((card, i) => {
+            const r = card.getBoundingClientRect();
+            if (r.right > vpRect.left + 2 && r.left < vpRect.right - 2) {
+                if (first === null) first = i;
+                last = i;
+            }
+        });
+    }
+
+    if (first === null) first = 0;
+    if (last === null) last = Math.max(0, first);
+
+    result.firstVisible = first;
+    result.lastVisible = last;
+    return result;
+}
+function startAutoAdvance() {
+    stopAutoAdvance();
+    autoAdvanceInterval = setInterval(() => {
+        try { nextCard(); } catch (e) { /* ignore */ }
+    }, AUTO_ADVANCE_MS);
+}
+
+function stopAutoAdvance() {
+    if (autoAdvanceInterval) {
+        clearInterval(autoAdvanceInterval);
+        autoAdvanceInterval = null;
+    }
+}
+
+function resetAutoAdvance() {
+    stopAutoAdvance();
+    startAutoAdvance();
+}
+function playVisibleCards() {
+    const track = document.querySelector('.carousel-track');
+    const viewport = document.querySelector('.carousel-viewport');
+    if (!track || !viewport) return;
+    const cards = track.querySelectorAll('.card');
+    if (!cards.length) return;
+    const vpRect = viewport.getBoundingClientRect();
+    cards.forEach(card => {
+        const vid = card.querySelector('video');
+        if (!vid) return;
+        const r = card.getBoundingClientRect();
+        // play if visible in viewport (allow partial visibility)
+        if (r.right > vpRect.left + 10 && r.left < vpRect.right - 10) {
+            vid.muted = true;
+            vid.play().catch(() => { });
+        } else {
+            try { vid.pause(); } catch (e) { }
+        }
     });
 }
 
@@ -176,7 +375,7 @@ function createDJCard(dj, index) {
     const posterSrc = dj.poster_path ? `/storage/${dj.poster_path}` : '';
 
     card.innerHTML = `
-        <video class="dj-video-preview" src="${videoSrc}" ${posterSrc ? `poster="${posterSrc}"` : ''} muted loop playsinline preload="none"></video>
+        <video class="dj-video-preview" src="${videoSrc}" ${posterSrc ? `poster="${posterSrc}"` : ''} muted autoplay loop playsinline preload="metadata"></video>
         <p class="dj-name">DJ ${dj.name || ''}</p>
     `;
 

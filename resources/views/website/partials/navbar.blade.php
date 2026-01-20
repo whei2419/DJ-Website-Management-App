@@ -15,7 +15,7 @@
         <div class="nav-bottom">
             <ul>
                 <li class="nav-item">
-                    <a href="">Home</a>
+                    <a href="{{ route('site.index') }}">Home</a>
                 </li>
                 <li class="nav-item">
                     <a href="{{ route('site.gallery') }}">Gallery</a>
@@ -28,7 +28,9 @@
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a href="">Register now</a>
+                    <a
+                        href="https://outlook.office.com/book/YSLBEAUTYLIGHTCLUBRISINGBEATS@loreal.onmicrosoft.com/?ismsaljsauthenabled">Register
+                        now</a>
                 </li>
             </ul>
 
