@@ -25,7 +25,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('dates', function (Blueprint $table) {
-            $table->foreignId('dj_id')->nullable()->constrained('d_j_s')->onDelete('set null');
+            $table->foreignId('dj_id')->nullable()->constrained('djs')->onDelete('set null');
         });
     }
 };

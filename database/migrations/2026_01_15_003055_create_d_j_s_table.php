@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('djs', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('video_url');
-            $table->string('slot');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('djs')) {
+            Schema::create('djs', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->string('video_url');
+                $table->string('slot');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

@@ -18,7 +18,7 @@
                     <a href="">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a href="">Gallery</a>
+                    <a href="{{ route('site.gallery') }}">Gallery</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a href="#" aria-haspopup="true" aria-expanded="false" tabindex="0">Learn more</a>
@@ -35,4 +35,3 @@
         </div>
     </div>
 </div>
-

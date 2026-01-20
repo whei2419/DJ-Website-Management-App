@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('dates', function (Blueprint $table) {
             $table->id();
             $table->date('date');
-            $table->foreignId('dj_id')->nullable()->constrained('d_j_s')->onDelete('set null');
+            $table->foreignId('dj_id')->nullable()->constrained('djs')->onDelete('set null');
             $table->timestamps();
         });
     }

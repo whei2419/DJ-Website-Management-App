@@ -36,9 +36,26 @@ class WeekendDatesSeeder extends Seeder
             $currentDate->addDay();
         }
         
-        // Insert all weekend dates
-        Date::insert($weekendDates);
-        
-        $this->command->info('Successfully seeded ' . count($weekendDates) . ' weekend dates from Feb 7 to March 1, 2026');
+        // Filter out dates that already exist to avoid duplicates
+        if (count($weekendDates) > 0) {
+            $existing = Date::whereBetween('date', [$startDate->toDateString(), $endDate->toDateString()])
+                ->pluck('date')
+                ->map(function ($d) {
+                    return (new \Carbon\Carbon($d))->format('Y-m-d');
+                })->toArray();
+
+            $toInsert = array_filter($weekendDates, function ($item) use ($existing) {
+                return !in_array($item['date'], $existing);
+            });
+
+            if (count($toInsert) > 0) {
+                Date::insert(array_values($toInsert));
+                $this->command->info('Successfully seeded ' . count($toInsert) . ' weekend dates from Feb 7 to March 1, 2026');
+            } else {
+                $this->command->info('Weekend dates already seeded for Feb 7 to March 1, 2026');
+            }
+        } else {
+            $this->command->info('No weekend dates to seed');
+        }
     }
 }

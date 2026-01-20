@@ -15,5 +15,8 @@ class Date extends Model
         'date' => 'date',
     ];
 
-    // DJ assignment removed: dates are standalone now
+    public function djs()
+    {
+        return $this->hasMany(DJ::class);
+    }
 }
