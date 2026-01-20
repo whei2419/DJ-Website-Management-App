@@ -93,6 +93,9 @@ class DJController extends Controller
                     'poster' => $posterUrl,
                     'name' => $dj->name,
                     'slot' => $dj->slot ?? '-',
+                    'date' => $dj->date ? ($dj->date->date instanceof \Illuminate\Support\Carbon ? $dj->date->date->format('M d, Y') : $dj->slot) : ($dj->slot ?? '-'),
+                    'date_id' => $dj->date_id,
+                    'visible' => (bool) $dj->visible,
                     'actions' => view('admin.djs.partials.actions', ['dj' => $dj])->render(),
                 ];
             })->values();

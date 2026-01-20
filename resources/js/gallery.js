@@ -176,17 +176,7 @@ function createDJCard(dj, index) {
     const posterSrc = dj.poster_path ? `/storage/${dj.poster_path}` : '';
 
     card.innerHTML = `
-        <video 
-            class="dj-video-preview" 
-            autoPlay 
-            muted 
-            loop
-            src="${videoSrc}"
-            ${posterSrc ? `poster="${posterSrc}"` : ''}
-            muted
-            loop
-            playsinline>
-        </video>
+        <video class="dj-video-preview" src="${videoSrc}" ${posterSrc ? `poster="${posterSrc}"` : ''} muted loop playsinline preload="none"></video>
         <p class="dj-name">${dj.name}</p>
     `;
 
@@ -196,6 +186,15 @@ function createDJCard(dj, index) {
     // Add hover effect to play preview
     const video = card.querySelector('.dj-video-preview');
     if (video && videoSrc) {
+        // Ensure it does not autoplay in the gallery
+        try {
+            video.pause();
+            video.currentTime = 0;
+            video.preload = 'none';
+        } catch (e) {
+            // ignore
+        }
+
         card.addEventListener('mouseenter', () => {
             video.play().catch(err => console.log('Video play failed:', err));
         });

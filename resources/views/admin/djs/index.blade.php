@@ -142,12 +142,14 @@
                                                     <th>Video Preview</th>
                                                     <th>Name</th>
                                                     <th>Slot</th>
+                                                    <th>Date</th>
+                                                    <th>Visible</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody class="table-tbody">
                                                 <tr>
-                                                    <td colspan="5" class="text-center py-4">
+                                                    <td colspan="7" class="text-center py-4">
                                                         <div class="spinner-border spinner-border-sm me-2" role="status">
                                                         </div>
                                                         <span class="text-muted">Loading DJs...</span>

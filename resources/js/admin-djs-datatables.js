@@ -74,6 +74,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 },
                 {
+                    data: 'date',
+                    render: function (data) {
+                        return `<div class="text-muted"><i class="fas fa-calendar-alt me-1"></i>${data}</div>`;
+                    }
+                },
+                {
+                    data: 'visible',
+                    width: '110px',
+                    render: function (data) {
+                        if (data) {
+                            return `<span class="badge bg-success">Visible</span>`;
+                        }
+                        return `<span class="badge bg-secondary">Hidden</span>`;
+                    }
+                },
+                {
                     data: 'id',
                     orderable: false,
                     searchable: false,
