@@ -19,8 +19,9 @@ class VideoPreviewService
     public function generatePreview(string $videoPath): ?string
     {
         try {
-            // Check if FFmpeg is available
-            if (!$this->isFfmpegAvailable()) {
+            // Resolve FFmpeg binary path
+            $ffmpeg = $this->getFfmpegBinary();
+            if (!$ffmpeg) {
                 Log::warning('FFmpeg not available, skipping video preview generation');
                 return null;
             }
@@ -44,7 +45,7 @@ class VideoPreviewService
             // - Lower audio bitrate (64k)
             // - Fast encoding preset
             $process = new Process([
-                'ffmpeg',
+                $ffmpeg,
                 '-i', $fullPath,
                 '-vf', 'scale=400:-2',  // Scale to 400px width, maintain aspect ratio
                 '-b:v', '500k',          // Video bitrate 500 kbps
@@ -86,7 +87,8 @@ class VideoPreviewService
     public function generatePoster(string $videoPath): ?string
     {
         try {
-            if (!$this->isFfmpegAvailable()) {
+            $ffmpeg = $this->getFfmpegBinary();
+            if (!$ffmpeg) {
                 return null;
             }
 
@@ -104,7 +106,7 @@ class VideoPreviewService
 
             // Extract frame at 1 second
             $process = new Process([
-                'ffmpeg',
+                $ffmpeg,
                 '-i', $fullPath,
                 '-ss', '00:00:01',       // Seek to 1 second
                 '-vframes', '1',         // Extract 1 frame
@@ -144,12 +146,44 @@ class VideoPreviewService
     private function isFfmpegAvailable(): bool
     {
         try {
-            $process = new Process(['ffmpeg', '-version']);
+            $ffmpeg = $this->getFfmpegBinary();
+            if (!$ffmpeg) return false;
+
+            $process = new Process([$ffmpeg, '-version']);
             $process->run();
             return $process->isSuccessful();
         } catch (\Exception $e) {
             return false;
         }
+    }
+
+    /**
+     * Attempt to locate an ffmpeg binary.
+     * Prefer env('FFMPEG_BINARY'), then common install locations.
+     *
+     * @return string|null
+     */
+    private function getFfmpegBinary(): ?string
+    {
+        $env = env('FFMPEG_BINARY');
+        if ($env && is_executable($env)) {
+            return $env;
+        }
+
+        $candidates = [
+            '/opt/homebrew/bin/ffmpeg',
+            '/usr/local/bin/ffmpeg',
+            '/usr/bin/ffmpeg',
+            '/bin/ffmpeg'
+        ];
+
+        foreach ($candidates as $bin) {
+            if (is_executable($bin)) {
+                return $bin;
+            }
+        }
+
+        return null;
     }
 
     /**

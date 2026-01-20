@@ -149,16 +149,29 @@ class DJController extends Controller
             $previewPath = $videoService->generatePreview($path);
             $posterPath = $videoService->generatePoster($path);
 
-            if ($previewPath) {
-                $data['preview_video_path'] = $previewPath;
+            // If preview generation failed, rollback upload and return error
+            if (! $previewPath) {
+                if (Storage::disk('public')->exists($path)) {
+                    Storage::disk('public')->delete($path);
+                }
+
+                $errorMessage = 'Failed to generate preview (FFmpeg required).';
+
+                if ($request->wantsJson() || $request->expectsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => $errorMessage,
+                        'errors' => ['video' => [$errorMessage]]
+                    ], 422);
+                }
+
+                return back()->withErrors(['video' => $errorMessage])->withInput();
             }
+
+            $data['preview_video_path'] = $previewPath;
             if ($posterPath) {
                 $data['poster_path'] = $posterPath;
             }
-        }
-
-        if ($request->filled('video_url')) {
-            $data['video_url'] = $request->input('video_url');
         }
 
         $dj = DJ::create($data);
