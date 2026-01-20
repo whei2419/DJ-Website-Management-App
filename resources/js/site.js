@@ -1,5 +1,4 @@
-// Site JS entry: import compiled Bootstrap CSS + JS
-import 'bootstrap/dist/css/bootstrap.min.css';
+// Site JS entry: import Bootstrap JS only (CSS imported in SASS)
 import 'bootstrap';
 
 // Animation libraries
@@ -118,14 +117,14 @@ if (document.readyState === 'loading') {
 function initMobileMenu() {
 	const toggle = document.querySelector('.mobile-menu-toggle');
 	const navBottom = document.querySelector('.nav-bottom');
-	
+
 	if (!toggle || !navBottom) return;
-	
-	toggle.addEventListener('click', function() {
+
+	toggle.addEventListener('click', function () {
 		const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
 		toggle.setAttribute('aria-expanded', !isExpanded);
 		navBottom.classList.toggle('active');
-		
+
 		// Prevent body scroll when menu is open
 		if (!isExpanded) {
 			document.body.style.overflow = 'hidden';
@@ -133,11 +132,11 @@ function initMobileMenu() {
 			document.body.style.overflow = '';
 		}
 	});
-	
+
 	// Close menu when clicking nav links
 	const navLinks = navBottom.querySelectorAll('a');
 	navLinks.forEach(link => {
-		link.addEventListener('click', function() {
+		link.addEventListener('click', function () {
 			if (window.innerWidth <= 768) {
 				toggle.setAttribute('aria-expanded', 'false');
 				navBottom.classList.remove('active');
@@ -145,9 +144,9 @@ function initMobileMenu() {
 			}
 		});
 	});
-	
+
 	// Close menu on window resize if switching to desktop
-	window.addEventListener('resize', function() {
+	window.addEventListener('resize', function () {
 		if (window.innerWidth > 768) {
 			toggle.setAttribute('aria-expanded', 'false');
 			navBottom.classList.remove('active');

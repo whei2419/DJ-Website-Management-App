@@ -1,2 +1,5 @@
-@use './site/navbar';
-@use './site/section';
+// Import Bootstrap first (using @import since it needs to be globally available)
+// Custom styles after to override Bootstrap
+@import 'bootstrap/scss/bootstrap';
+@import './site/navbar';
+@import './site/section';
