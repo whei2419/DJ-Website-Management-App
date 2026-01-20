@@ -34,6 +34,11 @@
                 <input type="text" name="slot" id="slot" class="form-control" required>
             </div>
 
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="visible" name="visible" value="1" checked>
+                <label class="form-check-label" for="visible">Show in gallery</label>
+            </div>
+
             <button type="submit" class="btn btn-success">Create DJ</button>
         </form>
     </div>

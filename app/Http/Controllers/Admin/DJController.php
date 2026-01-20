@@ -134,10 +134,11 @@ class DJController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'slot' => 'required|string|max:255',
+            'visible' => 'sometimes|boolean',
             'video' => 'required|file|mimetypes:video/mp4,video/quicktime,video/x-msvideo,video/x-ms-wmv,video/webm,video/x-matroska|max:512000', // 500MB
         ]);
 
-        $data = $request->only(['name', 'slot']);
+        $data = $request->only(['name', 'slot', 'visible']);
 
         // Prefer explicit date_id from request, otherwise map slot (date string) to date_id
         if ($request->filled('date_id')) {
@@ -256,6 +257,11 @@ class DJController extends Controller
                     }
                 }
             }
+        }
+
+        // Handle visible flag on update if present
+        if ($request->has('visible')) {
+            $data['visible'] = $request->input('visible') ? 1 : 0;
         }
 
         if ($request->hasFile('video')) {

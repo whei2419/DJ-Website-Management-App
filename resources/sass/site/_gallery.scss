@@ -79,6 +79,7 @@
                     overflow: hidden;
                     cursor: pointer;
                     transition: transform 0.3s ease, box-shadow 0.3s ease;
+                    height: 500px;
 
                     &:hover {
                         transform: translateY(-5px);
@@ -87,7 +88,7 @@
 
                     .dj-video-preview {
                         width: 100%;
-                        aspect-ratio: 16 / 9;
+                        height: 100%;
                         object-fit: cover;
                         display: block;
                     }

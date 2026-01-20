@@ -29,12 +29,12 @@ class SiteController extends Controller
         // Support both numeric date ID and date string (YYYY-MM-DD)
         try {
             if (is_numeric($dateId)) {
-                $djs = DJ::where('date_id', $dateId)->get();
+                $djs = DJ::where('date_id', $dateId)->where('visible', true)->get();
             } else {
                 // attempt to find Date by date column
                 $dateModel = Date::whereDate('date', $dateId)->first();
                 if ($dateModel) {
-                    $djs = DJ::where('date_id', $dateModel->id)->get();
+                    $djs = DJ::where('date_id', $dateModel->id)->where('visible', true)->get();
                 } else {
                     // no matching date found; return empty array
                     return response()->json([]);

@@ -18,6 +18,7 @@ class DJ extends Model
         'name',
         'slot',
         'date_id',
+        'visible',
         'video_url',
         'video_path',
         'preview_video_path',

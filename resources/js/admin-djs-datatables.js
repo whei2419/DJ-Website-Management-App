@@ -7,8 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const DjTitle = document.getElementById('DjTitle');
     const addOpen = document.getElementById('addEditDJModal');
     const saveUrl = saveDJRoute;
-    const dateGrid = document.getElementById('dateGrid');
     const dateIdInput = document.getElementById('djDateId');
+    const dateGrid = document.getElementById('dateGrid');
+    const visibleInput = document.getElementById('djVisible');
 
     let availableDates = [];
     let djTable = null;
@@ -198,6 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // reset selections
             slotInput.value = "";
             document.querySelectorAll('.date-card').forEach(c => c.classList.remove('selected'));
+            if (visibleInput) visibleInput.checked = true;
         } else {
             DjTitle.innerHTML = "Edit DJ";
             nameInput.value = djData.name;
@@ -209,6 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     card.classList.add('selected');
                 }
             });
+            if (visibleInput) visibleInput.checked = !!djData.visible;
             // video input left blank for security reasons
         }
     }
@@ -236,6 +239,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // include date_id if present
         if (dateIdInput && dateIdInput.value) {
             formData.append('date_id', dateIdInput.value);
+        }
+        // include visibility flag
+        if (visibleInput) {
+            formData.append('visible', visibleInput.checked ? 1 : 0);
         }
         // append file object for video if present
         if (videoInput && videoInput.files && videoInput.files.length > 0) {

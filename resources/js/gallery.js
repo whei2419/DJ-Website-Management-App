@@ -178,6 +178,9 @@ function createDJCard(dj, index) {
     card.innerHTML = `
         <video 
             class="dj-video-preview" 
+            autoPlay 
+            muted 
+            loop
             src="${videoSrc}"
             ${posterSrc ? `poster="${posterSrc}"` : ''}
             muted
@@ -185,7 +188,6 @@ function createDJCard(dj, index) {
             playsinline>
         </video>
         <p class="dj-name">${dj.name}</p>
-        <p class="dj-slot">Slot: ${dj.slot}</p>
     `;
 
     // Add click event to open modal

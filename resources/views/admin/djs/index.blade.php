@@ -44,6 +44,11 @@
                                 </div>
                                 <small class="error-message"></small>
                             </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="djVisible" name="visible" value="1"
+                                    checked>
+                                <label class="form-check-label" for="djVisible">Show in gallery</label>
+                            </div>
                         </form>
                     </div>
                     <div class="modal-footer">

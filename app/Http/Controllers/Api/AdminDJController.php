@@ -89,6 +89,7 @@ class AdminDJController extends Controller
                 'name' => 'required|string|max:255',
                 'slot' => 'required|string|max:255',
                 'video' => 'required|file|mimetypes:video/mp4,video/quicktime,video/x-msvideo,video/x-ms-wmv,video/webm|max:102400',
+                'visible' => 'sometimes|boolean',
             ]);
 
             $path = null;
@@ -112,6 +113,7 @@ class AdminDJController extends Controller
                 'name' => $validated['name'],
                 'slot' => $validated['slot'],
                 'date_id' => $dateId,
+                'visible' => $request->has('visible') ? (int) $request->input('visible') : 1,
                 'video_path' => $path,
             ]);
 
