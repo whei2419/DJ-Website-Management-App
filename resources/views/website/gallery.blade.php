@@ -8,4 +8,5 @@
 
 @section('content')
     @include('website.sections.galery')
+    @include('website.partials.footer')
 @endsection

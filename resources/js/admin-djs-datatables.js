@@ -212,10 +212,16 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateModalInfo(isAdd, djData = null) {
         if (isAdd) {
             DjTitle.innerHTML = "Add DJ";
-            // reset selections
+            // reset form fields and selections
+            if (form) form.reset();
+            // ensure file input is cleared
+            if (videoInput) try { videoInput.value = ''; } catch (e) { /* ignore */ }
             slotInput.value = "";
+            if (dateIdInput) dateIdInput.value = '';
             document.querySelectorAll('.date-card').forEach(c => c.classList.remove('selected'));
             if (visibleInput) visibleInput.checked = true;
+            // clear validation errors
+            clearErrors();
         } else {
             DjTitle.innerHTML = "Edit DJ";
             nameInput.value = djData.name;
@@ -349,8 +355,9 @@ document.addEventListener('DOMContentLoaded', () => {
             showFieldError(nameInput, 'Name is required');
             isValid = false;
         }
-        if (!slotInput.value.trim()) {
-            showFieldError(slotInput, 'Please select a time slot');
+        // require a selected date (date_id)
+        if (dateIdInput && !dateIdInput.value.trim()) {
+            showFieldError(dateIdInput, 'Please select a date');
             isValid = false;
         }
         if (!videoInput.files || videoInput.files.length === 0) {
@@ -386,7 +393,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function displayErrors(errors) {
         Object.keys(errors).forEach((key) => {
             const errorMessage = errors[key][0];
-            const field = document.getElementById(`dj${capitalize(key)}`);
+            let field = null;
+            if (key === 'date_id') {
+                field = document.getElementById('djDateId') || document.getElementById('date_id');
+            } else {
+                field = document.getElementById(`dj${capitalize(key)}`);
+            }
             if (field) {
                 showFieldError(field, errorMessage);
             }

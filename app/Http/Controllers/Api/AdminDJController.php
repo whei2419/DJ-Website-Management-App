@@ -26,8 +26,12 @@ class AdminDJController extends Controller
 
             if (!empty($search)) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('slot', 'like', "%{$search}%");
+                    $q->where('name', 'like', "%{$search}%");
+                    if (is_numeric($search)) {
+                        $q->orWhere('date_id', (int) $search);
+                    } else {
+                        $q->orWhere('slot', 'like', "%{$search}%");
+                    }
                 });
             }
 
@@ -87,7 +91,8 @@ class AdminDJController extends Controller
 
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
-                'slot' => 'required|string|max:255',
+                'date_id' => 'required|integer|exists:dates,id',
+                'slot' => 'nullable|string|max:255',
                 'video' => 'required|file|mimetypes:video/mp4,video/quicktime,video/x-msvideo,video/x-ms-wmv,video/webm|max:102400',
                 'visible' => 'sometimes|boolean',
             ]);
@@ -98,20 +103,12 @@ class AdminDJController extends Controller
                 $path = $file->store('djs', 'public');
             }
 
-            // Determine date_id: prefer explicit `date_id` from request, otherwise resolve from slot
-            $dateId = null;
-            if ($request->filled('date_id')) {
-                $dateId = (int) $request->input('date_id');
-            } elseif (is_numeric($validated['slot'])) {
-                $dateId = (int) $validated['slot'];
-            } else {
-                $dateModel = \App\Models\Date::whereDate('date', $validated['slot'])->first();
-                if ($dateModel) $dateId = $dateModel->id;
-            }
+            // date_id is required by validation; use it directly
+            $dateId = (int) $request->input('date_id');
 
             $dj = DJ::create([
                 'name' => $validated['name'],
-                'slot' => $validated['slot'],
+                'slot' => $validated['slot'] ?? null,
                 'date_id' => $dateId,
                 'visible' => $request->has('visible') ? (int) $request->input('visible') : 1,
                 'video_path' => $path,

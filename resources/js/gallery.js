@@ -177,30 +177,49 @@ function createDJCard(dj, index) {
 
     card.innerHTML = `
         <video class="dj-video-preview" src="${videoSrc}" ${posterSrc ? `poster="${posterSrc}"` : ''} muted loop playsinline preload="none"></video>
-        <p class="dj-name">${dj.name}</p>
+        <p class="dj-name">DJ ${dj.name || ''}</p>
     `;
 
     // Add click event to open modal
     card.addEventListener('click', () => openDJModal(dj));
 
-    // Add hover effect to play preview
+    // Add hover effect to play preview (improved load/play handling to reduce glitches)
     const video = card.querySelector('.dj-video-preview');
     if (video && videoSrc) {
-        // Ensure it does not autoplay in the gallery
+        // Prepare video for autoplay on hover: muted, loop, preload metadata
         try {
-            video.pause();
-            video.currentTime = 0;
-            video.preload = 'none';
+            video.muted = true;
+            video.loop = true;
+            video.playsInline = true;
+            video.preload = 'metadata';
         } catch (e) {
-            // ignore
+            // ignore if properties aren't writable
         }
 
+        let playPending = false;
+        const tryPlay = () => {
+            if (video.readyState >= 3) { // HAVE_FUTURE_DATA / can play through
+                video.play().catch(err => console.log('Video play failed:', err));
+            } else if (!playPending) {
+                playPending = true;
+                const onCanPlay = () => {
+                    playPending = false;
+                    video.play().catch(err => console.log('Video play failed:', err));
+                    video.removeEventListener('canplay', onCanPlay);
+                };
+                video.addEventListener('canplay', onCanPlay);
+                // Trigger load in case preload didn't start
+                try { video.load(); } catch (e) { /* ignore */ }
+            }
+        };
+
         card.addEventListener('mouseenter', () => {
-            video.play().catch(err => console.log('Video play failed:', err));
+            tryPlay();
         });
+
         card.addEventListener('mouseleave', () => {
-            video.pause();
-            video.currentTime = 0;
+            try { video.pause(); } catch (e) { /* ignore */ }
+            // Do not reset currentTime here to avoid repeated seeking glitches
         });
     }
 
@@ -209,34 +228,85 @@ function createDJCard(dj, index) {
 
 // Open modal with DJ details
 function openDJModal(dj) {
-    const modal = new bootstrap.Modal(document.getElementById('exampleModal'));
+    const modalEl = document.getElementById('exampleModal');
 
-    // Set DJ name in modal
-    const modalTitle = document.querySelector('#exampleModal .modal-title.dj-name');
-    if (modalTitle) {
-        modalTitle.textContent = `${dj.name} - Slot ${dj.slot}`;
-    }
+    // Set DJ name in modal (display name only)
+    const modalTitle = modalEl.querySelector('.modal-title.dj-name');
+    if (modalTitle) modalTitle.textContent = `DJ ${dj.name || ''}`;
 
     // Set video in modal
-    const modalVideo = document.querySelector('#exampleModal .selected-vide');
+    const modalVideo = modalEl.querySelector('.selected-vide');
+    const fullVideoSrc = dj.video_path ? `/storage/${dj.video_path}` : (dj.preview_video_path ? `/storage/${dj.preview_video_path}` : '');
     if (modalVideo) {
-        const videoSrc = dj.video_path ? `/storage/${dj.video_path}` : '';
-        modalVideo.src = videoSrc;
+        modalVideo.src = fullVideoSrc;
         modalVideo.controls = true;
-
-        // Play video when modal is shown
-        modal._element.addEventListener('shown.bs.modal', () => {
-            modalVideo.play().catch(err => console.log('Video play failed:', err));
-        });
-
-        // Pause video when modal is hidden
-        modal._element.addEventListener('hidden.bs.modal', () => {
-            modalVideo.pause();
-            modalVideo.currentTime = 0;
-        });
+        modalVideo.poster = dj.poster_path ? `/storage/${dj.poster_path}` : '';
+        try { modalVideo.load(); } catch (e) { /* ignore */ }
     }
 
-    modal.show();
+    // If Bootstrap's JS is available, use it; otherwise use a lightweight DOM fallback
+    if (window.bootstrap && typeof window.bootstrap.Modal === 'function') {
+        const modal = new bootstrap.Modal(modalEl);
+
+        if (modalVideo) {
+            modalEl.addEventListener('shown.bs.modal', () => {
+                modalVideo.play().catch(err => console.log('Video play failed:', err));
+            }, { once: true });
+
+            modalEl.addEventListener('hidden.bs.modal', () => {
+                try {
+                    modalVideo.pause();
+                    modalVideo.currentTime = 0;
+                    // clear source and poster so next open starts clean
+                    modalVideo.removeAttribute('src');
+                    modalVideo.removeAttribute('poster');
+                    try { modalVideo.load(); } catch (e) { /* ignore */ }
+                } catch (e) { /* ignore */ }
+            }, { once: true });
+        }
+
+        modal.show();
+        return;
+    }
+
+    // Lightweight fallback: show modal, add backdrop, and wire close handling
+    modalEl.classList.add('show');
+    modalEl.style.display = 'block';
+    modalEl.setAttribute('aria-modal', 'true');
+    modalEl.removeAttribute('aria-hidden');
+    document.body.classList.add('modal-open');
+
+    // create backdrop
+    const backdrop = document.createElement('div');
+    backdrop.className = 'modal-backdrop fade show';
+    document.body.appendChild(backdrop);
+
+    const cleanup = () => {
+        modalEl.classList.remove('show');
+        modalEl.style.display = 'none';
+        modalEl.setAttribute('aria-hidden', 'true');
+        modalEl.removeAttribute('aria-modal');
+        document.body.classList.remove('modal-open');
+        if (backdrop && backdrop.parentNode) backdrop.parentNode.removeChild(backdrop);
+        if (modalVideo) {
+            try { modalVideo.pause(); modalVideo.currentTime = 0; } catch (e) { /* ignore */ }
+            modalVideo.src = '';
+        }
+        // remove listeners
+        const closeBtn = modalEl.querySelector('[data-bs-dismiss="modal"]');
+        if (closeBtn) closeBtn.removeEventListener('click', onClose);
+        backdrop.removeEventListener('click', onClose);
+    };
+
+    const onClose = (e) => {
+        e && e.preventDefault();
+        cleanup();
+    };
+
+    // wire close button and backdrop
+    const closeBtn = modalEl.querySelector('[data-bs-dismiss="modal"]');
+    if (closeBtn) closeBtn.addEventListener('click', onClose);
+    backdrop.addEventListener('click', onClose);
 }
 
 // Display message when no data is available

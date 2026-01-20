@@ -376,3 +376,27 @@
             }
         }
     }
+
+    .faq-section {
+
+        .white-fq {
+            padding: 60px 100px;
+
+            h2,
+            p {
+                color: #000000;
+            }
+        }
+
+        h2 {
+            font-size: 75px;
+            margin-bottom: 40px;
+
+        }
+
+        p {
+            font-size: 40px;
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+    }

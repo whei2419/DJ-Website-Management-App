@@ -17,6 +17,7 @@
 
     .gallery-section {
         padding: 2rem 0 4rem;
+        min-height: 800px;
 
         h1 {
             text-align: center;
@@ -74,16 +75,28 @@
                 padding: 2rem 0;
 
                 .card {
-                    background: #1a1a1a;
-                    border-radius: 8px;
+                    background: #000000;
+                    border-radius: 10px;
                     overflow: hidden;
                     cursor: pointer;
-                    transition: transform 0.3s ease, box-shadow 0.3s ease;
+                    transition: transform 0.28s ease, box-shadow 0.28s ease;
                     height: 500px;
+                    position: relative;
+                    border: 1px solid rgba(255, 255, 255, 0.06);
+
+                    // subtle overlay over the video for readable text
+                    &::before {
+                        content: '';
+                        position: absolute;
+                        inset: 0;
+                        background: rgba(0, 0, 0, 0.45);
+                        z-index: 1;
+                        pointer-events: none;
+                    }
 
                     &:hover {
-                        transform: translateY(-5px);
-                        box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
+                        transform: translateY(-6px);
+                        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
                     }
 
                     .dj-video-preview {
@@ -91,14 +104,22 @@
                         height: 100%;
                         object-fit: cover;
                         display: block;
+                        position: relative;
+                        z-index: 0;
                     }
 
                     .dj-name {
                         font-size: 1.2rem;
-                        font-weight: 600;
-                        padding: 1rem;
+                        font-weight: 300;
                         margin: 0;
                         color: #ffffff;
+                        position: absolute;
+                        left: 50%;
+                        bottom: 22px;
+                        transform: translateX(-50%);
+                        z-index: 2;
+                        padding: 0;
+                        background: transparent;
                     }
 
                     .dj-slot {
@@ -157,11 +178,13 @@
 
 // Modal styling
 .modal-content {
-    background-color: #1a1a1a;
+    background-color: rgba(0, 0, 0, 0.92);
     color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.04);
 
     .modal-header {
-        border-bottom: 1px solid #333333;
+        background: transparent;
+        border-bottom: none;
 
         .btn-close {
             filter: invert(1);
@@ -177,4 +200,39 @@
             background-color: #000000;
         }
     }
+}
+
+/* Modal show/hide animations (works with Bootstrap or our fallback) */
+.modal.fade .modal-dialog {
+    transform: translateY(20px) scale(0.98);
+    opacity: 0;
+    transition: transform 280ms cubic-bezier(.2, .8, .2, 1), opacity 220ms ease;
+}
+
+.modal.show .modal-dialog {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
+.modal-backdrop.fade {
+    opacity: 0;
+    transition: opacity 220ms ease;
+}
+
+.modal-backdrop.show {
+    opacity: 0.6;
+}
+
+/* Close button micro-interactions */
+.modal .btn-close {
+    transition: transform 160ms ease, opacity 160ms ease;
+    transform-origin: center;
+}
+
+.modal .btn-close:hover {
+    transform: scale(1.06);
+}
+
+.modal .btn-close:active {
+    transform: scale(0.96);
 }

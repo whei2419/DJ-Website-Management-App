@@ -28,7 +28,7 @@ class DJController extends Controller
             $dates = \App\Models\Date::orderBy('date', 'asc')
                 ->get()
                 ->map(function ($date) {
-                    $djCount = DJ::where('slot', $date->date->format('Y-m-d'))->count();
+                    $djCount = DJ::where('date_id', $date->id)->count();
                     return [
                         'id' => $date->id,
                         'date' => $date->date->format('Y-m-d'),
@@ -61,8 +61,12 @@ class DJController extends Controller
 
             if (!empty($search)) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('slot', 'like', "%{$search}%");
+                    $q->where('name', 'like', "%{$search}%");
+                    if (is_numeric($search)) {
+                        $q->orWhere('date_id', (int) $search);
+                    } else {
+                        $q->orWhere('slot', 'like', "%{$search}%");
+                    }
                 });
             }
 
@@ -136,27 +140,13 @@ class DJController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'slot' => 'required|string|max:255',
+            'date_id' => 'required|integer|exists:dates,id',
+            'slot' => 'nullable|string|max:255',
             'visible' => 'sometimes|boolean',
             'video' => 'required|file|mimetypes:video/mp4,video/quicktime,video/x-msvideo,video/x-ms-wmv,video/webm,video/x-matroska|max:512000', // 500MB
         ]);
 
-        $data = $request->only(['name', 'slot', 'visible']);
-
-        // Prefer explicit date_id from request, otherwise map slot (date string) to date_id
-        if ($request->filled('date_id')) {
-            $data['date_id'] = (int) $request->input('date_id');
-        } elseif (!empty($data['slot'])) {
-            // if slot is numeric, assume it's a date id
-            if (is_numeric($data['slot'])) {
-                $data['date_id'] = (int) $data['slot'];
-            } else {
-                $dateModel = \App\Models\Date::whereDate('date', $data['slot'])->first();
-                if ($dateModel) {
-                    $data['date_id'] = $dateModel->id;
-                }
-            }
-        }
+        $data = $request->only(['name', 'slot', 'visible', 'date_id']);
 
         if ($request->hasFile('video')) {
             $file = $request->file('video');
@@ -235,6 +225,7 @@ class DJController extends Controller
             'name' => 'required|string|max:255',
             'video' => 'nullable|file|mimetypes:video/mp4,video/quicktime,video/x-msvideo,video/x-ms-wmv,video/webm|max:200000',
             'slot' => 'nullable|string',
+            'date_id' => 'nullable|integer|exists:dates,id',
         ]);
 
         $dj = DJ::findOrFail($id);
@@ -243,20 +234,19 @@ class DJController extends Controller
 
         if ($request->filled('slot')) {
             $data['slot'] = $request->input('slot');
+        }
 
-            // If date_id explicitly provided, prefer it
-            if ($request->filled('date_id')) {
-                $data['date_id'] = (int) $request->input('date_id');
-            } else {
-                // Update date_id mapping for slot
+        if ($request->filled('date_id')) {
+            $data['date_id'] = (int) $request->input('date_id');
+        } else {
+            // If date_id not explicitly provided, try to map from slot if possible
+            if (!empty($data['slot'])) {
                 if (is_numeric($data['slot'])) {
                     $data['date_id'] = (int) $data['slot'];
                 } else {
                     $dateModel = \App\Models\Date::whereDate('date', $data['slot'])->first();
                     if ($dateModel) {
                         $data['date_id'] = $dateModel->id;
-                    } else {
-                        $data['date_id'] = null;
                     }
                 }
             }
