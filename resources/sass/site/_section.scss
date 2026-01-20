@@ -48,7 +48,6 @@
         overflow: hidden;
         // 16:9 aspect ratio
         aspect-ratio: 16 / 9;
-        margin-top: 70px;
 
         .hero-video {
             position: absolute;
@@ -75,6 +74,7 @@
         // On smaller screens, adjust height if needed
         @media (max-width: 768px) {
             aspect-ratio: 16 / 9;
+            margin-top: 70px;
         }
     }
 
