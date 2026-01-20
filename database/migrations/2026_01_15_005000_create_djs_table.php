@@ -17,6 +17,7 @@ return new class extends Migration {
                 $table->id();
                 $table->string('name');
                 $table->string('slot');
+                $table->foreignId('date_id')->nullable()->constrained('dates')->onDelete('cascade');
                 $table->timestamps();
             });
         }
@@ -29,6 +30,6 @@ return new class extends Migration {
      */
     public function down()
     {
-        Schema::dropIfExists('d_j_s');
+        Schema::dropIfExists('djs');
     }
 };

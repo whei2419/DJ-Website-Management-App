@@ -26,9 +26,7 @@ class SiteController extends Controller
 
     public function getDJsByDate($dateId)
     {
-        $djs = \App\Models\DJ::where('date_id', $dateId)
-            ->orderBy('slot')
-            ->get();
+        $djs = DJ::where('date_id', $dateId)->get();
         return response()->json($djs);
     }
 }

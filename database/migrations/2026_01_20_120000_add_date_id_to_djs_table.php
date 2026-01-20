@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('d_j_s')) {
-            Schema::table('d_j_s', function (Blueprint $table) {
-                if (!Schema::hasColumn('d_j_s', 'date_id')) {
+        if (Schema::hasTable('djs')) {
+            Schema::table('djs', function (Blueprint $table) {
+                if (!Schema::hasColumn('djs', 'date_id')) {
                     $table->foreignId('date_id')->nullable()->constrained('dates')->onDelete('cascade')->after('id');
                 }
             });
@@ -25,9 +25,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (Schema::hasTable('d_j_s')) {
-            Schema::table('d_j_s', function (Blueprint $table) {
-                if (Schema::hasColumn('d_j_s', 'date_id')) {
+        if (Schema::hasTable('djs')) {
+            Schema::table('djs', function (Blueprint $table) {
+                if (Schema::hasColumn('djs', 'date_id')) {
                     $table->dropForeign(['date_id']);
                     $table->dropColumn('date_id');
                 }
