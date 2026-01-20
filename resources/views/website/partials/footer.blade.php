@@ -11,14 +11,14 @@
             <div class="col" data-aos="fade-up" data-aos-duration="700" data-aos-delay="200">
                 <div class="footer-links">
                     <div class="row">
-                        <div class="col">
+                        <div class="col-md-6 col-12">
                             <ul>
                                 <li><a href="#">menu</a></li>
                                 <li><a href="#">register</a></li>
                                 <li><a href="#">How to participate?</a></li>
                             </ul>
                         </div>
-                        <div class="col">
+                        <div class="col-md-6 col-12">
                             <ul>
                                 <li><a href="#">info</a></li>
                                 <li><a href="#">faqs</a></li>

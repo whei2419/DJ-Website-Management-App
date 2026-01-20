@@ -1,6 +1,6 @@
 <div class="container-fluid section-with-cards">
-    <div class="row">
-        <div class="col" data-aos="fade-up" data-aos-duration="800">
+    <div class="row m-0 p-0">
+        <div class="col-md-4 col-12" data-aos="fade-up" data-aos-duration="800">
             <div class="content-container">
                 <p class="number">01</p>
                 <h1 class="title">
@@ -13,7 +13,7 @@
                 </p>
             </div>
         </div>
-        <div class="col white" data-aos="fade-up" data-aos-duration="800" data-aos-delay="200">
+        <div class="col-md-4 col-12 white" data-aos="fade-up" data-aos-duration="800" data-aos-delay="200">
             <div class="content-container">
                 <p class="number">02</p>
                 <h1 class="title">
@@ -27,7 +27,7 @@
                 </p>
             </div>
         </div>
-        <div class="col" data-aos="fade-up" data-aos-duration="800" data-aos-delay="400">
+        <div class="col-md-4 col-12" data-aos="fade-up" data-aos-duration="800" data-aos-delay="400">
             <div class="content-container">
                 <p class="number">03</p>
                 <h1 class="title">

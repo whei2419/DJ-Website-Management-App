@@ -9,6 +9,12 @@
         line-height: 1.2;
     }
 
+    body {
+        background-color: #000000;
+        width: 100vw;
+        overflow-x: hidden;
+    }
+
     .btn-primary {
         background-color: #ffffff;
         color: #000000;
@@ -28,29 +34,47 @@
             background-color: #ffffff;
             color: #000000;
         }
+
+        //on smaller screens, adjust button size
+        @media (max-width: 768px) {
+            font-size: 16px;
+        }
     }
 
     .hero-section {
         position: relative;
         width: 100%;
-        height: 100vh;
+        max-width: 100%;
         overflow: hidden;
+        // 16:9 aspect ratio
+        aspect-ratio: 16 / 9;
+        margin-top: 70px;
 
         .hero-video {
-            /* center and cover using min-width/min-height to avoid gaps */
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            min-width: 100%;
-            min-height: 100%;
-            width: auto;
-            height: auto;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             object-fit: cover;
             pointer-events: none;
-            will-change: transform;
-            z-index: -1;
-            /* sit behind page content */
+            z-index: 0;
+        }
+
+        // Fallback for older browsers without aspect-ratio support
+        @supports not (aspect-ratio: 16 / 9) {
+            padding-top: 56.25%; // 16:9 ratio
+
+            .hero-video {
+                position: absolute;
+                top: 0;
+                left: 0;
+            }
+        }
+
+        // On smaller screens, adjust height if needed
+        @media (max-width: 768px) {
+            aspect-ratio: 16 / 9;
         }
     }
 
@@ -58,12 +82,26 @@
     .section-white {
         position: relative;
         background-color: #ffffff;
+        padding: 50px 0;
 
         img {
             width: 15vw;
             height: auto;
             object-fit: contain;
             margin: auto auto;
+
+            // Adjust logo size on smaller screens
+
+        }
+
+
+        @media (max-width: 768px) {
+            padding: 10px;
+
+            img {
+                width: 180px;
+                padding: 0;
+            }
         }
 
     }
@@ -81,6 +119,20 @@
             font-size: 55px;
             margin-top: 60px;
         }
+
+        // Adjust logo size on smaller screens
+        @media (max-width: 768px) {
+            padding: 30px 0;
+
+            h1 {
+                font-size: 30px;
+            }
+
+            p {
+                font-size: 18px;
+                margin-top: 30px;
+            }
+        }
     }
 
     .section-register {
@@ -97,12 +149,35 @@
             a {
                 display: inline-block;
             }
+
+            // Adjust button size on smaller screens
+            @media (max-width: 768px) {
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+
+                a {
+                    min-width: 100%;
+                }
+            }
         }
+
 
         p {
             font-size: 30px;
             margin-bottom: 30px;
             font-weight: 300;
+        }
+
+
+        // Adjust text size on smaller screens
+        @media (max-width: 768px) {
+            padding-top: 20px;
+            padding-bottom: 50px;
+
+            p {
+                font-size: 18px;
+            }
         }
     }
 
@@ -116,6 +191,11 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+        }
+
+        // On smaller screens, adjust height if needed
+        @media (max-width: 768px) {
+            height: 300px;
         }
     }
 
@@ -139,6 +219,7 @@
             .description {
                 color: #000000;
             }
+
 
         }
 
@@ -165,6 +246,27 @@
                 line-height: 25px;
             }
         }
+
+        // Adjust card size on smaller screens
+        @media (max-width: 768px) {
+            .content-container {
+                padding: 20px 30px;
+
+                .number {
+                    font-size: 24px;
+                }
+
+                .title {
+                    font-size: 24px;
+                    margin-bottom: 20px;
+                }
+
+                .description {
+                    font-size: 14px;
+                    margin-bottom: 15px;
+                }
+            }
+        }
     }
 
     .footer {
@@ -183,6 +285,11 @@
                 object-fit: contain;
                 margin-bottom: 20px;
                 display: block;
+
+                // Adjust logo size on smaller screens
+                @media (max-width: 768px) {
+                    width: 300px;
+                }
             }
 
             .logo-2 {
@@ -226,6 +333,21 @@
         }
 
 
+        //on smaller screens, adjust footer layout
+        @media (max-width: 768px) {
+            .footer-links {
+                ul {
+                    text-align: center;
+                    margin: 10px 0 0 0;
 
+                    li {
+                        margin-bottom: 10px;
 
+                        a {
+                            font-size: 16px;
+                        }
+                    }
+                }
+            }
+        }
     }
