@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('addEditDJForm');
     const nameInput = document.getElementById('djName');
-    const slotInput = document.getElementById('djSlot');
+    // slot field removed from UI/DB; date selection uses `djDateId`
     const videoInput = document.getElementById('djVideo');
     const saveDJButton = document.getElementById('saveDJButton');
     const DjTitle = document.getElementById('DjTitle');
@@ -67,16 +67,15 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>`;
                     }
                 },
-                {
-                    data: 'slot',
-                    render: function (data) {
-                        return `<div class="text-muted"><i class="fas fa-calendar-day me-1"></i>${data}</div>`;
-                    }
-                },
+                // slot column removed (no longer stored in DB)
                 {
                     data: 'date',
                     render: function (data) {
-                        return `<div class="text-muted"><i class="fas fa-calendar-alt me-1"></i>${data}</div>`;
+                        if (!data) return '';
+                        return `<span class="d-inline-flex align-items-center border border-primary text-primary rounded-1 px-2 py-1" style="font-size:0.95rem;">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            <span>${data}</span>
+                        </span>`;
                     }
                 },
                 {
@@ -197,14 +196,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Select new date
         card.classList.add('selected');
-        slotInput.value = card.dataset.date;
         if (dateIdInput) {
             dateIdInput.value = card.dataset.id || '';
         }
 
-        // Clear error if any
-        slotInput.classList.remove('is-invalid');
-        const errEl = getErrorEl(slotInput);
+        // Clear error if any on the date input
+        if (dateIdInput) dateIdInput.classList.remove('is-invalid');
+        const errEl = getErrorEl(dateIdInput);
         if (errEl) errEl.textContent = '';
     }
 
@@ -216,7 +214,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (form) form.reset();
             // ensure file input is cleared
             if (videoInput) try { videoInput.value = ''; } catch (e) { /* ignore */ }
-            slotInput.value = "";
             if (dateIdInput) dateIdInput.value = '';
             document.querySelectorAll('.date-card').forEach(c => c.classList.remove('selected'));
             if (visibleInput) visibleInput.checked = true;
@@ -225,7 +222,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             DjTitle.innerHTML = "Edit DJ";
             nameInput.value = djData.name;
-            slotInput.value = djData.slot;
             if (dateIdInput) dateIdInput.value = djData.date_id || '';
             // select the matching date card (prefer matching date_id, fallback to slot)
             document.querySelectorAll('.date-card').forEach(card => {
@@ -255,9 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // gather form data
         const formData = new FormData();
         formData.append('name', nameInput.value);
-        // ensure date-only value (YYYY-MM-DD) is sent
-        const slotValue = slotInput.value ? slotInput.value : '';
-        formData.append('slot', slotValue);
+        // `slot` removed from backend; associate by `date_id` only
         // include date_id if present
         if (dateIdInput && dateIdInput.value) {
             formData.append('date_id', dateIdInput.value);
@@ -274,7 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // log form data for debugging
         console.log('Form Data:', {
             name: nameInput.value,
-            slot: slotValue,
+            date_id: dateIdInput ? dateIdInput.value : null,
             video: (videoInput.files && videoInput.files.length > 0) ? videoInput.files[0].name : null
         });
 
@@ -323,7 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     // Reset form
                     if (form) form.reset();
-                    slotInput.value = "";
+                    if (dateIdInput) dateIdInput.value = '';
                     document.querySelectorAll('.date-card').forEach(c => c.classList.remove('selected'));
 
                     // Reload both the DJ list and available dates

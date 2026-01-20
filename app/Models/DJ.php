@@ -16,7 +16,6 @@ class DJ extends Model
     
     protected $fillable = [
         'name',
-        'slot',
         'date_id',
         'visible',
         'video_url',

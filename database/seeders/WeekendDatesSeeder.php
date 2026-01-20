@@ -27,8 +27,6 @@ class WeekendDatesSeeder extends Seeder
             if ($currentDate->isSaturday() || $currentDate->isSunday()) {
                 $weekendDates[] = [
                     'date' => $currentDate->format('Y-m-d'),
-                    'event_name' => $currentDate->format('l') . ' Night',
-                    'location' => 'Main Venue',
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];

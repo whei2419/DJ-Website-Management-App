@@ -51,7 +51,7 @@ class AdminDJController extends Controller
                     'id' => $dj->id,
                     'video_preview' => $videoPreview,
                     'name' => $dj->name,
-                    'slot' => $dj->slot ?? '-',
+                    // slot removed from DB; date can be read via relation if needed
                     'actions' => [
                         'edit_url' => route('admin.djs.edit', $dj->id),
                         'destroy_url' => route('admin.djs.destroy', $dj->id),
@@ -108,7 +108,6 @@ class AdminDJController extends Controller
 
             $dj = DJ::create([
                 'name' => $validated['name'],
-                'slot' => $validated['slot'] ?? null,
                 'date_id' => $dateId,
                 'visible' => $request->has('visible') ? (int) $request->input('visible') : 1,
                 'video_path' => $path,

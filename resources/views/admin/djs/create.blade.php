@@ -29,12 +29,16 @@
                     (FFmpeg required).</div>
             </div>
 
+            <input type="hidden" name="date_id" id="djDateId">
             <div class="mb-3">
-                <label for="slot" class="form-label">Slot</label>
-                <input type="text" name="slot" id="slot" class="form-control">
-                <input type="hidden" name="date_id" id="date_id">
-                <div class="form-text">Select a date from the date picker; the system prefers `date_id` for association.
+                <label class="form-label">Assigned Date</label>
+                <div id="dateGrid" class="date-grid">
+                    <div class="text-center text-muted py-3">
+                        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                        Loading available dates...
+                    </div>
                 </div>
+                <div class="form-text">Select a date from the picker to assign this DJ.</div>
             </div>
 
             <div class="mb-3 form-check">

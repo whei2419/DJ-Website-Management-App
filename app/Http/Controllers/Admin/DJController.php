@@ -96,8 +96,7 @@ class DJController extends Controller
                     'video_preview' => $videoPreview,
                     'poster' => $posterUrl,
                     'name' => $dj->name,
-                    'slot' => $dj->slot ?? '-',
-                    'date' => $dj->date ? ($dj->date->date instanceof \Illuminate\Support\Carbon ? $dj->date->date->format('M d, Y') : $dj->slot) : ($dj->slot ?? '-'),
+                        'date' => $dj->date ? ($dj->date->date instanceof \Illuminate\Support\Carbon ? $dj->date->date->format('M d, Y') : '-') : '-',
                     'date_id' => $dj->date_id,
                     'visible' => (bool) $dj->visible,
                     'actions' => view('admin.djs.partials.actions', ['dj' => $dj])->render(),
@@ -146,7 +145,8 @@ class DJController extends Controller
             'video' => 'required|file|mimetypes:video/mp4,video/quicktime,video/x-msvideo,video/x-ms-wmv,video/webm,video/x-matroska|max:512000', // 500MB
         ]);
 
-        $data = $request->only(['name', 'slot', 'visible', 'date_id']);
+        // Only persist allowed fields; `slot` is no longer a DB column
+        $data = $request->only(['name', 'visible', 'date_id']);
 
         if ($request->hasFile('video')) {
             $file = $request->file('video');
@@ -232,19 +232,16 @@ class DJController extends Controller
 
         $data = $request->only(['name']);
 
-        if ($request->filled('slot')) {
-            $data['slot'] = $request->input('slot');
-        }
-
+        // Map incoming slot -> date_id when date_id not present
         if ($request->filled('date_id')) {
             $data['date_id'] = (int) $request->input('date_id');
         } else {
-            // If date_id not explicitly provided, try to map from slot if possible
-            if (!empty($data['slot'])) {
-                if (is_numeric($data['slot'])) {
-                    $data['date_id'] = (int) $data['slot'];
+            $slotVal = $request->input('slot');
+            if (!empty($slotVal)) {
+                if (is_numeric($slotVal)) {
+                    $data['date_id'] = (int) $slotVal;
                 } else {
-                    $dateModel = \App\Models\Date::whereDate('date', $data['slot'])->first();
+                    $dateModel = \App\Models\Date::whereDate('date', $slotVal)->first();
                     if ($dateModel) {
                         $data['date_id'] = $dateModel->id;
                     }
@@ -340,9 +337,10 @@ class DJController extends Controller
         $dj1 = DJ::findOrFail($request->dj1_id);
         $dj2 = DJ::findOrFail($request->dj2_id);
 
-        $tempSlot = $dj1->slot;
-        $dj1->slot = $dj2->slot;
-        $dj2->slot = $tempSlot;
+        // swap the `date_id` values between the two DJs (no `slot` column exists)
+        $tempDateId = $dj1->date_id;
+        $dj1->date_id = $dj2->date_id;
+        $dj2->date_id = $tempDateId;
 
         $dj1->save();
         $dj2->save();

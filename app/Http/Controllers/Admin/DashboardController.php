@@ -28,7 +28,7 @@ class DashboardController extends Controller
         $dates = Date::orderBy('date', 'asc')
             ->get()
             ->map(function ($date) {
-                $djCount = DJ::where('slot', $date->date->format('Y-m-d'))->count();
+                $djCount = DJ::where('date_id', $date->id)->count();
                 return [
                     'id' => $date->id,
                     'date' => $date->date,

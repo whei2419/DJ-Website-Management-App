@@ -28,10 +28,28 @@ class DJController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'video_url' => 'nullable|url|max:1000',
+            'date_id' => 'nullable|integer|exists:dates,id',
             'slot' => 'nullable|string|max:100',
         ]);
 
-        DJ::create($data);
+        // Do not persist `slot` column; map to date_id if provided
+        $create = [
+            'name' => $data['name'],
+            'video_url' => $data['video_url'] ?? null,
+        ];
+
+        if (!empty($data['date_id'])) {
+            $create['date_id'] = (int) $data['date_id'];
+        } elseif (!empty($data['slot'])) {
+            if (is_numeric($data['slot'])) {
+                $create['date_id'] = (int) $data['slot'];
+            } else {
+                $dateModel = \App\Models\Date::whereDate('date', $data['slot'])->first();
+                if ($dateModel) $create['date_id'] = $dateModel->id;
+            }
+        }
+
+        DJ::create($create);
 
         return redirect()->route('admin.djs.index')->with('success', 'DJ created');
     }
@@ -46,10 +64,25 @@ class DJController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'video_url' => 'nullable|url|max:1000',
+            'date_id' => 'nullable|integer|exists:dates,id',
             'slot' => 'nullable|string|max:100',
         ]);
 
-        $dj->update($data);
+        $update = ['name' => $data['name']];
+        if (array_key_exists('video_url', $data)) $update['video_url'] = $data['video_url'];
+
+        if (!empty($data['date_id'])) {
+            $update['date_id'] = (int) $data['date_id'];
+        } elseif (!empty($data['slot'])) {
+            if (is_numeric($data['slot'])) {
+                $update['date_id'] = (int) $data['slot'];
+            } else {
+                $dateModel = \App\Models\Date::whereDate('date', $data['slot'])->first();
+                if ($dateModel) $update['date_id'] = $dateModel->id;
+            }
+        }
+
+        $dj->update($update);
 
         return redirect()->route('admin.djs.index')->with('success', 'DJ updated');
     }

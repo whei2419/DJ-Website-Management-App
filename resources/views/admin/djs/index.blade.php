@@ -23,10 +23,9 @@
                                 </div>
                                 <small class="error-message"></small>
                             </div>
+                            <input type="hidden" id="djDateId" name="date_id">
                             <div class="mb-3">
-                                <label for="slot" class="form-label">Time Slot</label>
-                                <input type="hidden" id="djSlot" name="slot" required>
-                                <input type="hidden" id="djDateId" name="date_id">
+                                <label class="form-label">Assigned Date</label>
                                 <div id="dateGrid" class="date-grid">
                                     <div class="text-center text-muted py-3">
                                         <div class="spinner-border spinner-border-sm me-2" role="status"></div>
@@ -141,7 +140,6 @@
                                                     <th>ID</th>
                                                     <th>Video Preview</th>
                                                     <th>Name</th>
-                                                    <th>Slot</th>
                                                     <th>Date</th>
                                                     <th>Visible</th>
                                                     <th>Action</th>
@@ -149,7 +147,7 @@
                                             </thead>
                                             <tbody class="table-tbody">
                                                 <tr>
-                                                    <td colspan="7" class="text-center py-4">
+                                                    <td colspan="6" class="text-center py-4">
                                                         <div class="spinner-border spinner-border-sm me-2" role="status">
                                                         </div>
                                                         <span class="text-muted">Loading DJs...</span>
