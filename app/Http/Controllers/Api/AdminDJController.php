@@ -97,9 +97,21 @@ class AdminDJController extends Controller
                 $path = $file->store('djs', 'public');
             }
 
+            // Determine date_id: prefer explicit `date_id` from request, otherwise resolve from slot
+            $dateId = null;
+            if ($request->filled('date_id')) {
+                $dateId = (int) $request->input('date_id');
+            } elseif (is_numeric($validated['slot'])) {
+                $dateId = (int) $validated['slot'];
+            } else {
+                $dateModel = \App\Models\Date::whereDate('date', $validated['slot'])->first();
+                if ($dateModel) $dateId = $dateModel->id;
+            }
+
             $dj = DJ::create([
                 'name' => $validated['name'],
                 'slot' => $validated['slot'],
+                'date_id' => $dateId,
                 'video_path' => $path,
             ]);
 

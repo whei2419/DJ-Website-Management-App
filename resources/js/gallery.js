@@ -28,10 +28,32 @@ function setupEventListeners() {
 // Load all available dates
 async function loadDates() {
     try {
-        const response = await fetch('/api/dates');
-        if (!response.ok) throw new Error('Failed to fetch dates');
+        const response = await fetch('/api/dates', { headers: { 'Accept': 'application/json' } });
+        if (!response.ok) throw new Error('Failed to fetch dates: ' + response.status);
 
-        dates = await response.json();
+        const payload = await response.json();
+        // support API that returns { data: [...] } or raw array
+        let rawDates = Array.isArray(payload) ? payload : (payload.data || payload);
+
+        // Normalize date objects to ensure `id` and `date` (YYYY-MM-DD) are present
+        dates = rawDates.map(d => {
+            const id = d.id || d.ID || d.date_id || null;
+            let dateVal = null;
+            if (!d.date) {
+                dateVal = null;
+            } else if (typeof d.date === 'string') {
+                dateVal = d.date.split('T')[0];
+            } else if (d.date.date) {
+                // Carbon serialized form
+                dateVal = (typeof d.date.date === 'string') ? d.date.date.split('T')[0] : null;
+            } else {
+                dateVal = null;
+            }
+
+            return { id, date: dateVal, event_name: d.event_name || d.eventName || null, raw: d };
+        });
+
+        console.log('Loaded dates payload:', dates);
 
         if (dates.length > 0) {
             // Find the index of the date nearest to today
@@ -39,7 +61,9 @@ async function loadDates() {
             let nearestIndex = 0;
             let minDiff = Infinity;
             dates.forEach((dateObj, idx) => {
+                if (!dateObj.date) return;
                 const dateVal = new Date(dateObj.date);
+                if (isNaN(dateVal)) return;
                 const diff = Math.abs(dateVal - today);
                 if (diff < minDiff) {
                     minDiff = diff;
@@ -78,8 +102,16 @@ function displayCurrentDate() {
     const dateElement = document.getElementById('date');
 
     if (dateElement && currentDate) {
+        if (!currentDate.date) {
+            dateElement.textContent = 'Date unavailable';
+            return;
+        }
         // Format date as 'February 22, 2026' only
         const dateObj = new Date(currentDate.date);
+        if (isNaN(dateObj)) {
+            dateElement.textContent = 'Date unavailable';
+            return;
+        }
         const formattedDate = dateObj.toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
@@ -94,10 +126,12 @@ async function loadDJsForCurrentDate() {
     if (!currentDate) return;
 
     try {
-        const response = await fetch(`/api/dates/${currentDate.id}/djs`);
-        if (!response.ok) throw new Error('Failed to fetch DJs');
+        const identifier = currentDate.id || currentDate.date;
+        const response = await fetch(`/api/dates/${encodeURIComponent(identifier)}/djs`, { headers: { 'Accept': 'application/json' } });
+        if (!response.ok) throw new Error('Failed to fetch DJs: ' + response.status);
 
-        const djs = await response.json();
+        const payload = await response.json();
+        const djs = Array.isArray(payload) ? payload : (payload.data || payload);
         displayDJs(djs);
     } catch (error) {
         console.error('Error loading DJs:', error);

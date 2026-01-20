@@ -139,6 +139,21 @@ class DJController extends Controller
 
         $data = $request->only(['name', 'slot']);
 
+        // Prefer explicit date_id from request, otherwise map slot (date string) to date_id
+        if ($request->filled('date_id')) {
+            $data['date_id'] = (int) $request->input('date_id');
+        } elseif (!empty($data['slot'])) {
+            // if slot is numeric, assume it's a date id
+            if (is_numeric($data['slot'])) {
+                $data['date_id'] = (int) $data['slot'];
+            } else {
+                $dateModel = \App\Models\Date::whereDate('date', $data['slot'])->first();
+                if ($dateModel) {
+                    $data['date_id'] = $dateModel->id;
+                }
+            }
+        }
+
         if ($request->hasFile('video')) {
             $file = $request->file('video');
             $path = $file->store('djs', 'public');
@@ -224,6 +239,23 @@ class DJController extends Controller
 
         if ($request->filled('slot')) {
             $data['slot'] = $request->input('slot');
+
+            // If date_id explicitly provided, prefer it
+            if ($request->filled('date_id')) {
+                $data['date_id'] = (int) $request->input('date_id');
+            } else {
+                // Update date_id mapping for slot
+                if (is_numeric($data['slot'])) {
+                    $data['date_id'] = (int) $data['slot'];
+                } else {
+                    $dateModel = \App\Models\Date::whereDate('date', $data['slot'])->first();
+                    if ($dateModel) {
+                        $data['date_id'] = $dateModel->id;
+                    } else {
+                        $data['date_id'] = null;
+                    }
+                }
+            }
         }
 
         if ($request->hasFile('video')) {

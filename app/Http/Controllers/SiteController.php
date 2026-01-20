@@ -26,7 +26,25 @@ class SiteController extends Controller
 
     public function getDJsByDate($dateId)
     {
-        $djs = DJ::where('date_id', $dateId)->get();
-        return response()->json($djs);
+        // Support both numeric date ID and date string (YYYY-MM-DD)
+        try {
+            if (is_numeric($dateId)) {
+                $djs = DJ::where('date_id', $dateId)->get();
+            } else {
+                // attempt to find Date by date column
+                $dateModel = Date::whereDate('date', $dateId)->first();
+                if ($dateModel) {
+                    $djs = DJ::where('date_id', $dateModel->id)->get();
+                } else {
+                    // no matching date found; return empty array
+                    return response()->json([]);
+                }
+            }
+
+            return response()->json($djs);
+        } catch (\Throwable $e) {
+            \Log::error('Error fetching DJs by date', ['date' => $dateId, 'error' => $e->getMessage()]);
+            return response()->json([], 500);
+        }
     }
 }
