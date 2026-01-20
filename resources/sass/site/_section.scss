@@ -166,3 +166,66 @@
             }
         }
     }
+
+    .footer {
+        background-color: #000000;
+        padding-bottom: 50px;
+
+        .image-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+
+            .logo-1 {
+                width: 450px;
+                height: auto;
+                object-fit: contain;
+                margin-bottom: 20px;
+                display: block;
+            }
+
+            .logo-2 {
+                width: 150px;
+                height: auto;
+                object-fit: contain;
+                margin-bottom: 20px;
+                display: block;
+            }
+        }
+
+        .footer-links {
+            padding-top: 11px;
+
+            ul {
+                list-style: none;
+                padding: 0;
+                margin: 20px 0 0 0;
+                text-align: left;
+
+                li:first-child {
+                    a {
+                        font-weight: bold;
+                    }
+                }
+
+                a {
+                    color: #ffffff;
+                    text-decoration: none;
+                    font-size: 20px;
+                    font-weight: 300;
+                    text-transform: uppercase;
+                    transition: color 0.3s ease;
+
+                    &:hover {
+                        color: #c5c5c58d;
+
+                    }
+                }
+            }
+        }
+
+
+
+
+    }
