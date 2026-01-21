@@ -21,7 +21,7 @@
                 <!-- END NAVBAR TOGGLER -->
                 <!-- BEGIN NAVBAR LOGO -->
                 <div class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
-                    <a href="." aria-label="Admin">
+                    <a href="{{ route('dashboard') }}" aria-label="Admin">
                         Admin
                     </a>
                 </div>

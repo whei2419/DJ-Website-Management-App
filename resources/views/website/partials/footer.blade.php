@@ -13,16 +13,16 @@
                     <div class="row">
                         <div class="col-md-6 col-12">
                             <ul>
-                                <li><a href="#">menu</a></li>
+                                <li><a href="{{ route('site.gallery') }}">menu</a></li>
                                 <li><a
-                                        href="https://outlook.office.com/book/YSLBEAUTYLIGHTCLUBRISINGBEATS@loreal.onmicrosoft.com/?ismsaljsauthenabled">Register
+                                        href="https://outlook.office.com/book/YSLBEAUTYLIGHTCLUBRISINGBEATS@loreal.onmicrosoft.com/?ismsaljsauthenabled" target="_blank" rel="noopener">Register
                                         now</a></li>
                                 <li><a href="#howToParticipate">How to participate?</a></li>
                             </ul>
                         </div>
                         <div class="col-md-6 col-12">
                             <ul>
-                                <li><a href="#">info</a></li>
+                                <li><a href="{{ route('site.faq') }}">info</a></li>
                                 <li><a href="{{ route('site.faq') }}">FAQs</a></li>
                                 {{-- <li><a href="#">Privacy Policy</a></li> --}}
                                 <li><a href="{{ route('site.pda') }}">Terms &amp; Conditions</a></li>

@@ -173,7 +173,7 @@ function displayDJs(djs) {
     djs.forEach((dj, index) => {
         const card = createDJCard(dj, index);
         // layout handled by CSS for responsive sizing
-        card.style.flex = '0 0 auto';
+
         galleryContent.appendChild(card);
     });
 

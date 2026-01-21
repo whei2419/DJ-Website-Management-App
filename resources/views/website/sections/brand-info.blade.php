@@ -38,8 +38,8 @@
         </p>
 
         <div class="button-container" data-aos="fade-up" data-aos-duration="800" data-aos-delay="300">
-            <a href="#" class="btn btn-primary">REGISTER NOW</a>
-            <a href="#" class="btn btn-primary">FAQ</a>
+            <a href="https://outlook.office.com/book/YSLBEAUTYLIGHTCLUBRISINGBEATS@loreal.onmicrosoft.com/?ismsaljsauthenabled" class="btn btn-primary" target="_blank" rel="noopener">REGISTER NOW</a>
+            <a href="{{ route('site.faq') }}" class="btn btn-primary">FAQ</a>
         </div>
     </div>
 </div>
