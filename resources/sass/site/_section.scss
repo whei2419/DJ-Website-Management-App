@@ -439,11 +439,89 @@
             .accordion-body {
                 background-color: #07070796;
                 text-align: left;
-                color: #e6e6e6;
+                color: #b8b7b7;
                 font-size: 15px;
                 line-height: 1.5;
                 padding: 1rem 1.25rem 1.25rem 1.25rem;
                 border-top: 1px solid rgba(255, 255, 255, 0.03);
+
+                p {
+                    line-height: 1.6;
+                }
             }
         }
+
+        @media (max-width: 768px) {
+            margin-top: 80px;
+
+            h1 {
+                font-size: 25px;
+                margin-bottom: 30px;
+            }
+
+            h3 {
+                font-size: 20px;
+            }
+
+            .accordion {
+                .accordion-button {
+                    font-size: 16px;
+                }
+
+                .accordion-body {
+                    font-size: 14px;
+                }
+            }
+        }
+    }
+
+
+    .pda-section {
+        margin-top: 250px;
+
+        // on mobile, reduce top margin
+
+
+        h1 {
+            font-size: 36px;
+        }
+
+        h3 {
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        ul {
+            text-decoration: none;
+            //remove default list styling
+            list-style: none;
+            margin-bottom: 30px;
+            padding: 0;
+
+            p,
+            li {
+                text-decoration: none;
+                font-size: 14px;
+                line-height: 1.6;
+                color: #ffffff;
+                text-align: center;
+                font-weight: 300;
+            }
+        }
+
+
+        @media (max-width: 768px) {
+            margin-top: 50px;
+
+            h1 {
+                font-size: 28px;
+            }
+
+            h3 {
+                font-size: 20px;
+            }
+        }
+
+
     }

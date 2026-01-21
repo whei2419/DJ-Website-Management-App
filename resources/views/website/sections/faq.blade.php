@@ -1,6 +1,8 @@
 <div class="container-fluid">
     <div class="container text-center py-4 faq-section">
-        <img src="{{ asset('assets/images/logo.webp') }}" alt="Logo" class="logo-image mb-5">
+        {{-- <img src="{{ asset('assets/images/logo.webp') }}" alt="Logo" class="logo-image mb-5"> --}}
+
+        <h1 class="mb-5">Frequently Asked Questions</h1>
 
         <div class="accordion" id="faqAccordion" data-aos="fade-up" data-aos-duration="700">
 
@@ -115,6 +117,113 @@
                     <div class="accordion-body">
                         <p>Yes. You just need to be available on your allocated performance date and timeslot as per the
                             booking form.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item mb-3">
+                <h2 class="accordion-header" id="faq-heading-7">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#faq-collapse-7" aria-expanded="false" aria-controls="faq-collapse-7">
+                        I JUST WANT TO LEARN A NEW SKILL AND HAVE SOME FUN, IS THAT OKAY?
+                    </button>
+                </h2>
+                <div id="faq-collapse-7" class="accordion-collapse collapse" aria-labelledby="faq-heading-7"
+                    data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        <p>Absolutely. Everyone's motivations for why they sign up is different. If you just want to
+                            make some
+                            friends, try something new or push yourself out of your comfort zone, you should apply!</p>
+
+                        <p>However, all applicants should be willing to commit to the entire experience which means
+                            registering and booking your slot, attending YSL BEAUTY LIGHT CLUB POP-UP @ The Exchange TRX
+                            (G Floor,
+                            in front of Concierge), and performing during your designated timeslot.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item mb-3">
+                <h2 class="accordion-header" id="faq-heading-8">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#faq-collapse-8" aria-expanded="false" aria-controls="faq-collapse-8">
+                        DO I NEED TO OWN ANY DJ GEAR TO JOIN?
+                    </button>
+                </h2>
+                <div id="faq-collapse-8" class="accordion-collapse collapse" aria-labelledby="faq-heading-8"
+                    data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        <p>At the event, YSL BEAUTY LIGHT CLUB RISING BEATS will provide 2x CDJ3000 and 1x DJM900 Nexus2
+                            to
+                            perform during your 30-minute performance. However, all participants must bring their own DJ
+                            accessories (USB pen drives, headphones, DJ software/laptops).</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item mb-3">
+                <h2 class="accordion-header" id="faq-heading-9">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#faq-collapse-9" aria-expanded="false" aria-controls="faq-collapse-9">
+                        WHAT IF I CAN'T ATTEND THE PERFORMANCE DATE?
+                    </button>
+                </h2>
+                <div id="faq-collapse-9" class="accordion-collapse collapse" aria-labelledby="faq-heading-9"
+                    data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        <p>Unfortunately, due to time constraints and the volume of applicants that need to be reviewed,
+                            there are only four fixed timeslots each event day. All available performance timeslots are
+                            allocated on a first-come, first-served basis. If you are unable to attend your slot, please
+                            book the next available slot.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item mb-3">
+                <h2 class="accordion-header" id="faq-heading-10">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#faq-collapse-10" aria-expanded="false" aria-controls="faq-collapse-10">
+                        WHAT DO I NEED TO BE AVAILABLE FOR IF CONFIRMED FOR PERFORMANCE?
+                    </button>
+                </h2>
+                <div id="faq-collapse-10" class="accordion-collapse collapse" aria-labelledby="faq-heading-10"
+                    data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        <p>You will need to be available on your allocated performance date and timeslot as per the
+                            booking form. Attendance is 100% mandatory - failure to comply will result in your immediate
+                            withdrawal from the Event.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item mb-3">
+                <h2 class="accordion-header" id="faq-heading-11">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#faq-collapse-11" aria-expanded="false" aria-controls="faq-collapse-11">
+                        I MADE A MISTAKE ON MY PERFORMANCE BOOKING TIMESLOT – WHAT NOW?
+                    </button>
+                </h2>
+                <div id="faq-collapse-11" class="accordion-collapse collapse" aria-labelledby="faq-heading-11"
+                    data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        <p>If it’s critical you may reschedule the booking slot once, within 48 hours of the original
+                            booking through the same booking confirmation email link.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item mb-3">
+                <h2 class="accordion-header" id="faq-heading-12">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#faq-collapse-12" aria-expanded="false" aria-controls="faq-collapse-12">
+                        I DON’T LIVE IN KUALA LUMPUR – CAN I STILL APPLY?
+                    </button>
+                </h2>
+                <div id="faq-collapse-12" class="accordion-collapse collapse" aria-labelledby="faq-heading-12"
+                    data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        <p>Yes. If you're keen and interested, you may register. However, transportation and
+                            accommodation will not be covered by the Organiser.</p>
                     </div>
                 </div>
             </div>

@@ -21,9 +21,9 @@
                         <div class="col-md-6 col-12">
                             <ul>
                                 <li><a href="#">info</a></li>
-                                <li><a href="#">faqs</a></li>
+                                <li><a href="{{ route('site.faq') }}">FAQs</a></li>
                                 <li><a href="#">Privacy Policy</a></li>
-                                <li><a href="#">Terms & Conditions</a></li>
+                                <li><a href="{{ route('site.pda') }}">Terms &amp; Conditions</a></li>
                             </ul>
                         </div>
                     </div>

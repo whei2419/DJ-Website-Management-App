@@ -23,8 +23,8 @@
                 <li class="nav-item dropdown">
                     <a href="#" aria-haspopup="true" aria-expanded="false" tabindex="0">Learn more</a>
                     <div class="dropdown-menu" aria-label="submenu">
-                        <a href="{{ url('/about') }}">About</a>
-                        <a href="{{ url('/faq') }}">FAQ</a>
+                        <a href="{{ route('site.faq') }}">FAQ</a>
+                        <a href="{{ route('site.pda') }}">Terms &amp; Conditions</a>
                     </div>
                 </li>
                 <li class="nav-item">

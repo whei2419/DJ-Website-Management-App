@@ -23,9 +23,13 @@ Route::get('/', [SiteController::class, 'index'])->name('site.index');
 Route::get('/gallery', [SiteController::class, 'gallery'])->name('site.gallery');
 Route::get('/api/dates', [SiteController::class, 'getDates'])->name('site.dates');
 Route::get('/api/dates/{dateId}/djs', [SiteController::class, 'getDJsByDate'])->name('site.djs.by-date');
-Route::get('/faq', function () {
+Route::get('/pages/faq', function () {
     return view('website.FAQ');
-})->name('site.faq');
+})->name('site.faq'); 
+// pages/terms-and-conditions
+Route::get('/pages/terms-and-conditions', function () {
+    return view('website.PDA');
+})->name('site.pda');
 
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
