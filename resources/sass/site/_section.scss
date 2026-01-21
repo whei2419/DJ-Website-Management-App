@@ -23,16 +23,32 @@
         text-transform: uppercase;
         font-weight: bold;
         cursor: pointer;
-        transition: opacity 0.3s ease;
+        transition: background-color 0.18s ease, opacity 0.18s ease, transform 0.12s ease;
         border-radius: 0;
         min-width: 400px;
         font-size: 30px;
-
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+        box-sizing: border-box;
 
         &:hover {
-            opacity: 0.8;
+            opacity: 0.95;
             background-color: #ffffff;
             color: #000000;
+            transform: none;
+        }
+
+        &:focus {
+            outline: none;
+            box-shadow: none;
+        }
+
+        &:active {
+            /* keep button visually consistent when clicked */
+            transform: translateY(0);
+            opacity: 0.9;
         }
 
         //on smaller screens, adjust button size
