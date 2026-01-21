@@ -378,25 +378,72 @@
     }
 
     .faq-section {
+        margin-top: 250px;
 
-        .white-fq {
-            padding: 60px 100px;
-
-            h2,
-            p {
-                color: #000000;
-            }
-        }
-
-        h2 {
-            font-size: 75px;
-            margin-bottom: 40px;
-
+        .logo-image {
+            width: 20vw;
+            height: auto;
+            object-fit: contain;
         }
 
         p {
-            font-size: 40px;
+            font-size: 14px;
             margin-bottom: 20px;
             font-weight: 300;
+        }
+
+        // Dark-styled accordion overrides for FAQ
+        .accordion {
+            .accordion-item {
+                background: transparent;
+                border: none;
+            }
+
+            .accordion-button {
+                background-color: #0b0b0b00;
+                color: #ffffff;
+                font-size: 18px;
+                font-weight: 500;
+                padding: 1rem 0;
+                border: none;
+                box-shadow: none;
+                position: relative;
+
+                // keep Bootstrap chevron visible on dark bg
+                svg,
+                i {
+                    color: #ffffff;
+                }
+
+                // underline effect (hidden by default, shown when expanded)
+                &::before {
+                    content: '';
+                    position: absolute;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    height: 1px;
+                    background: transparent;
+                    transition: background 0.18s ease;
+                }
+
+                &.collapsed::before {
+                    background: rgba(255, 255, 255, 0.077); // subtle line when collapsed
+                }
+
+                &:not(.collapsed)::before {
+                    background: #ffffff3c; // white underline when open
+                }
+            }
+
+            .accordion-body {
+                background-color: #07070796;
+                text-align: left;
+                color: #e6e6e6;
+                font-size: 15px;
+                line-height: 1.5;
+                padding: 1rem 1.25rem 1.25rem 1.25rem;
+                border-top: 1px solid rgba(255, 255, 255, 0.03);
+            }
         }
     }
