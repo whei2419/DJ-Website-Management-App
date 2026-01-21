@@ -40,10 +40,6 @@
                             </div>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                            <a href="{{ route('profile.edit') }}" class="dropdown-item"><i class="fas fa-user me-2"></i>
-                                Profile</a>
-                            <a href="#" class="dropdown-item"><i class="fas fa-cog me-2"></i> Settings</a>
-                            <div class="dropdown-divider"></div>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt me-2"></i>
