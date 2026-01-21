@@ -311,15 +311,20 @@
                 margin: 20px 0 0 0;
                 text-align: left;
 
+                li {
+                    margin-bottom: 5px;
+                }
+
                 li:first-child {
                     a {
                         font-weight: 600;
+                        color: #ffffff;
 
                     }
                 }
 
                 a {
-                    color: #ffffff;
+                    color: #a6a6a6;
                     text-decoration: none;
                     font-size: 16px;
                     font-weight: 300;

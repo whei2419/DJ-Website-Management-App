@@ -1,4 +1,4 @@
-<div class="container-fluid section-with-cards">
+<div id="howToParticipate" class="container-fluid section-with-cards">
     <div class="row m-0 p-0">
         <div class="col-md-4 col-12" data-aos="fade-up" data-aos-duration="800">
             <div class="content-container">

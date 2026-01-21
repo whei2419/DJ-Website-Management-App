@@ -14,15 +14,17 @@
                         <div class="col-md-6 col-12">
                             <ul>
                                 <li><a href="#">menu</a></li>
-                                <li><a href="#">register</a></li>
-                                <li><a href="#">How to participate?</a></li>
+                                <li><a
+                                        href="https://outlook.office.com/book/YSLBEAUTYLIGHTCLUBRISINGBEATS@loreal.onmicrosoft.com/?ismsaljsauthenabled">Register
+                                        now</a></li>
+                                <li><a href="#howToParticipate">How to participate?</a></li>
                             </ul>
                         </div>
                         <div class="col-md-6 col-12">
                             <ul>
                                 <li><a href="#">info</a></li>
                                 <li><a href="{{ route('site.faq') }}">FAQs</a></li>
-                                <li><a href="#">Privacy Policy</a></li>
+                                {{-- <li><a href="#">Privacy Policy</a></li> --}}
                                 <li><a href="{{ route('site.pda') }}">Terms &amp; Conditions</a></li>
                             </ul>
                         </div>
