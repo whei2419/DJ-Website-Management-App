@@ -103,7 +103,7 @@ function navigateDate(direction) {
 // Display current date in the UI
 function displayCurrentDate() {
     currentDate = dates[currentDateIndex];
-    const dateElement = document.getElementById('date');
+    const dateElement = document.getElementById('gallery-date');
 
     if (dateElement && currentDate) {
         if (!currentDate.date) {
@@ -154,15 +154,25 @@ function displayDJs(djs) {
     currentCardIndex = 0;
 
     if (djs.length === 0) {
-        galleryContent.innerHTML = '<p class="no-data">More videos will be uploaded soon</p>';
+        // clear any existing cards
+        galleryContent.innerHTML = '';
+        // remove previous no-data if present
+        const viewport = document.querySelector('.carousel-viewport');
+        if (viewport) {
+            const prev = viewport.querySelector('.no-data, .loading-message');
+            if (prev) prev.remove();
+            const noData = document.createElement('p');
+            noData.className = 'no-data';
+            noData.textContent = 'More videos will be uploaded soon';
+            viewport.appendChild(noData);
+        }
         return;
     }
 
     // Create card for each DJ inside the carousel track
     djs.forEach((dj, index) => {
         const card = createDJCard(dj, index);
-        // ensure cards have consistent sizing for carousel
-        card.style.minWidth = '320px';
+        // layout handled by CSS for responsive sizing
         card.style.flex = '0 0 auto';
         galleryContent.appendChild(card);
     });
@@ -510,14 +520,22 @@ function openDJModal(dj) {
 
 // Display message when no data is available
 function displayNoDataMessage(message) {
-    const dateElement = document.getElementById('date');
+    const dateElement = document.getElementById('gallery-date');
     const galleryContent = document.querySelector('.gallery-content');
 
-    if (dateElement) {
-        dateElement.textContent = message;
-    }
+    if (dateElement) dateElement.textContent = message;
 
-    if (galleryContent) {
-        galleryContent.innerHTML = `<p class="no-data">${message}</p>`;
+    // place message centered in the viewport (not inside the track) so centering works reliably
+    const viewport = document.querySelector('.carousel-viewport');
+    if (viewport) {
+        // remove any existing messages
+        const prev = viewport.querySelector('.no-data, .loading-message');
+        if (prev) prev.remove();
+        // clear gallery content
+        if (galleryContent) galleryContent.innerHTML = '';
+        const msg = document.createElement('p');
+        msg.className = 'no-data';
+        msg.textContent = message;
+        viewport.appendChild(msg);
     }
 }

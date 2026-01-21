@@ -36,7 +36,7 @@
                     <polyline points="15 18 9 12 15 6"></polyline>
                 </svg>
             </button>
-            <p class="date" id="date">Loading dates...</p>
+            <p class="date" id="gallery-date">Loading dates...</p>
             <button class="right gallery-arrow" aria-label="Next date">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                     stroke-width="2">
@@ -60,6 +60,28 @@
                     display: flex;
                     gap: 16px;
                     align-items: stretch;
+                }
+
+                /* Card sizing: let CSS control responsive widths */
+                .gallery-content .card {
+                    flex: 0 0 auto;
+                    width: 320px;
+                    max-width: 100%;
+                }
+
+                .gallery-content .card .dj-video-preview {
+                    display: block;
+                    width: 100%;
+                    height: 220px;
+                    object-fit: cover;
+                    border-radius: 6px;
+                }
+
+                .gallery-content .card .dj-name {
+                    margin-top: 10px;
+                    color: #ffffff;
+                    font-size: 1rem;
+                    text-align: center;
                 }
 
                 .cards-arrow {
@@ -94,7 +116,77 @@
 
                 .carousel-viewport {
                     padding: 8px 56px;
-                    min-height: 600px
+                    min-height: 520px;
+                }
+
+                /* Responsive adjustments */
+                @media (max-width: 1200px) {
+                    .gallery-content .card {
+                        width: 300px;
+                    }
+
+                    .gallery-content .card .dj-video-preview {
+                        height: 200px;
+                    }
+                }
+
+                @media (max-width: 992px) {
+                    .gallery-content .card {
+                        width: 260px;
+                    }
+
+                    .carousel-viewport {
+                        padding: 8px 40px;
+                        min-height: 460px;
+                    }
+
+                    .gallery-content .card .dj-video-preview {
+                        height: 180px;
+                    }
+                }
+
+                @media (max-width: 768px) {
+                    .gallery-content {
+                        padding: 0 8px;
+                    }
+
+                    .carousel-viewport {
+                        padding: 8px 24px;
+                        min-height: 380px;
+                    }
+
+                    /* show single card mostly fullscreen on small screens */
+                    .gallery-content .card {
+                        width: calc(100% - 32px);
+                        margin: 0 auto;
+                    }
+
+                    .cards-arrow {
+                        display: none;
+                    }
+
+                    .gallery-date-controller .gallery-arrow {
+                        padding: 4px;
+                    }
+
+                    .gallery-content .card .dj-video-preview {
+                        height: 260px;
+                    }
+                }
+
+                @media (max-width: 480px) {
+                    .gallery-content .card .dj-video-preview {
+                        height: 200px;
+                    }
+
+                    .gallery-content .card .dj-name {
+                        font-size: 0.95rem;
+                    }
+
+                    .carousel-viewport {
+                        min-height: 320px;
+                        padding: 6px 16px;
+                    }
                 }
 
                 .gallery-content .card {
@@ -113,6 +205,21 @@
                     color: #fff;
                     font-size: 1rem;
                     text-align: center;
+                }
+
+                /* Also handle messages appended directly to the viewport (preferred)
+                   so they are visually centered despite transforms on the track */
+                .carousel-viewport>.no-data,
+                .carousel-viewport>.loading-message {
+                    position: absolute;
+                    left: 50%;
+                    top: 50%;
+                    transform: translate(-50%, -50%);
+                    margin: 0;
+                    color: #fff;
+                    font-size: 1rem;
+                    text-align: center;
+                    z-index: 25;
                 }
             </style>
             <button class="cards-arrow left" aria-label="Previous performance">

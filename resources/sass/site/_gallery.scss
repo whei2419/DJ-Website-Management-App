@@ -1,5 +1,6 @@
 // Gallery page styles
 .gallery-page {
+    margin-top: 80px;
     background-color: #000000;
     color: #ffffff;
 
@@ -12,6 +13,11 @@
             max-width: 300px;
             width: 80%;
             height: auto;
+
+            //on smaller screens
+            @media (max-width: 768px) {
+                max-width: 200px;
+            }
         }
     }
 
