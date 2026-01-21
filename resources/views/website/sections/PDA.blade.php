@@ -102,12 +102,6 @@
 
                 </section>
 
-                <section class="mb-4">
-                    <h2>Other Terms</h2>
-                    <p>These Terms incorporate our standard Terms &amp; Conditions. Please refer to the Privacy Pulicy
-                        and other Event materials for further details.</p>
-                </section>
-
             </div>
         </div>
     </div>
