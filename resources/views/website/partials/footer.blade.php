@@ -14,8 +14,8 @@
                         <div class="col-md-6 col-12">
                             <ul>
                                 <li><a href="{{ route('site.gallery') }}">menu</a></li>
-                                <li><a
-                                        href="https://outlook.office.com/book/YSLBEAUTYLIGHTCLUBRISINGBEATS@loreal.onmicrosoft.com/?ismsaljsauthenabled" target="_blank" rel="noopener">Register
+                                <li><a href="https://outlook.office.com/book/YSLBEAUTYLIGHTCLUBRISINGBEATS@loreal.onmicrosoft.com/?ismsaljsauthenabled"
+                                        target="_blank" rel="noopener">Register
                                         now</a></li>
                                 <li><a href="#howToParticipate">How to participate?</a></li>
                             </ul>
