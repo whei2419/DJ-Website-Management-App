@@ -251,7 +251,21 @@
             <div class="modal-content border">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5 dj-name" id="exampleModalLabel">DJ Performance</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="ms-auto d-flex gap-2 align-items-center">
+                        <button type="button" id="modalDownloadBtn" class="btn btn-outline-secondary btn-sm"
+                            title="Download preview" aria-label="Download preview">
+                            <i class="fas fa-download" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" id="modalCopyBtn" class="btn btn-outline-secondary btn-sm"
+                            title="Copy share link" aria-label="Copy share link">
+                            <i class="fas fa-link" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" id="modalShareBtn" class="btn btn-outline-primary btn-sm" title="Share"
+                            aria-label="Share">
+                            <i class="fas fa-share-alt" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
                 </div>
                 <div class="modal-body">
                     <video class="selected-vide w-100" controls playsinline></video>

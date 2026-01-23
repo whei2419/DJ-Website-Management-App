@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Date;
 use App\Models\DJ;
+use Illuminate\Support\Facades\Storage;
 
 class SiteController extends Controller
 {
@@ -45,6 +46,59 @@ class SiteController extends Controller
         } catch (\Throwable $e) {
             \Log::error('Error fetching DJs by date', ['date' => $dateId, 'error' => $e->getMessage()]);
             return response()->json([], 500);
+        }
+    }
+
+    /**
+     * Show a public share page for a DJ video.
+     */
+    public function showVideo($id)
+    {
+        try {
+            $dj = DJ::findOrFail($id);
+
+            // Determine source URL (prefer stored file)
+            $videoUrl = null;
+            $posterUrl = null;
+
+            if ($dj->video_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($dj->video_path)) {
+                $videoUrl = Storage::disk('public')->url($dj->video_path);
+            } elseif ($dj->preview_video_path && Storage::disk('public')->exists($dj->preview_video_path)) {
+                $videoUrl = Storage::disk('public')->url($dj->preview_video_path);
+            } elseif (!empty($dj->video_url)) {
+                $videoUrl = $dj->video_url;
+            }
+
+            if ($dj->poster_path && Storage::disk('public')->exists($dj->poster_path)) {
+                $posterUrl = Storage::disk('public')->url($dj->poster_path);
+            }
+
+            return view('website.video', compact('dj', 'videoUrl', 'posterUrl'));
+        } catch (\Throwable $e) {
+            \Log::error('Failed to show shared video', ['id' => $id, 'error' => $e->getMessage()]);
+            abort(404);
+        }
+    }
+
+    /**
+     * Download the preview video for a DJ (only serves preview, not original full video).
+     */
+    public function downloadPreview($id)
+    {
+        try {
+            $dj = DJ::findOrFail($id);
+
+            // Only allow downloading the preview video
+            if ($dj->preview_video_path && Storage::disk('public')->exists($dj->preview_video_path)) {
+                $fileName = basename($dj->preview_video_path);
+                return Storage::disk('public')->download($dj->preview_video_path, $fileName);
+            }
+
+            // If no preview available, return 404
+            abort(404, 'Preview not available');
+        } catch (\Throwable $e) {
+            \Log::error('Failed to download preview', ['id' => $id, 'error' => $e->getMessage()]);
+            abort(404);
         }
     }
 }

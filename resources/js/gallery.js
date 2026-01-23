@@ -453,6 +453,100 @@ function openDJModal(dj) {
         try { modalVideo.load(); } catch (e) { /* ignore */ }
     }
 
+    // Configure share, copy and download buttons
+    const shareUrl = `${window.location.origin}/videos/${dj.id}`;
+
+    const shareBtn = modalEl.querySelector('#modalShareBtn');
+    if (shareBtn) {
+        const fresh = shareBtn.cloneNode(true);
+        shareBtn.parentNode.replaceChild(fresh, shareBtn);
+        fresh.addEventListener('click', async () => {
+            const shareData = { title: `DJ ${dj.name || ''}`, text: 'Check out this DJ performance', url: shareUrl };
+            if (navigator.share) {
+                try { await navigator.share(shareData); return; } catch (e) { /* ignore */ }
+            }
+
+            // robust copy helper: try Clipboard API, then execCommand fallback
+            const copied = await (async function(text) {
+                try {
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        await navigator.clipboard.writeText(text);
+                        return true;
+                    }
+                } catch (e) {
+                    // continue to fallback
+                }
+
+                try {
+                    const ta = document.createElement('textarea');
+                    ta.style.position = 'fixed';
+                    ta.style.left = '-9999px';
+                    ta.style.top = '0';
+                    ta.value = text;
+                    document.body.appendChild(ta);
+                    ta.focus();
+                    ta.select();
+                    const ok = document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    return !!ok;
+                } catch (e) {
+                    return false;
+                }
+            })(shareUrl);
+
+            if (copied) {
+                alert('Link copied to clipboard');
+                return;
+            }
+
+            window.prompt('Copy this link', shareUrl);
+        });
+    }
+
+    const copyBtn = modalEl.querySelector('#modalCopyBtn');
+    if (copyBtn) {
+        const freshC = copyBtn.cloneNode(true);
+        copyBtn.parentNode.replaceChild(freshC, copyBtn);
+        freshC.addEventListener('click', async () => {
+            const copied = await (async function(text) {
+                try {
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        await navigator.clipboard.writeText(text);
+                        return true;
+                    }
+                } catch (e) {}
+                try {
+                    const ta = document.createElement('textarea');
+                    ta.style.position = 'fixed';
+                    ta.style.left = '-9999px';
+                    ta.style.top = '0';
+                    ta.value = text;
+                    document.body.appendChild(ta);
+                    ta.focus();
+                    ta.select();
+                    const ok = document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    return !!ok;
+                } catch (e) { return false; }
+            })(shareUrl);
+
+            if (copied) { alert('Link copied to clipboard'); return; }
+            window.prompt('Copy this link', shareUrl);
+        });
+    }
+
+    const downloadBtn = modalEl.querySelector('#modalDownloadBtn');
+    if (downloadBtn) {
+        const downloadUrl = `${window.location.origin}/videos/${dj.id}/download`;
+        const freshD = downloadBtn.cloneNode(true);
+        downloadBtn.parentNode.replaceChild(freshD, downloadBtn);
+        freshD.addEventListener('click', (e) => {
+            e.preventDefault();
+            // open download in new tab/window to trigger browser download behavior
+            window.open(downloadUrl, '_blank');
+        });
+    }
+
     // If Bootstrap's JS is available, use it; otherwise use a lightweight DOM fallback
     if (window.bootstrap && typeof window.bootstrap.Modal === 'function') {
         const modal = new bootstrap.Modal(modalEl);

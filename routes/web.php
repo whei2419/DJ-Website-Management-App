@@ -21,6 +21,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [SiteController::class, 'index'])->name('site.index');
 Route::get('/gallery', [SiteController::class, 'gallery'])->name('site.gallery');
+// Public video share route
+Route::get('/videos/{id}', [SiteController::class, 'showVideo'])->name('site.video.show');
+// Public preview download (preview only)
+Route::get('/videos/{id}/download', [SiteController::class, 'downloadPreview'])->name('site.video.download');
 Route::get('/api/dates', [SiteController::class, 'getDates'])->name('site.dates');
 Route::get('/api/dates/{dateId}/djs', [SiteController::class, 'getDJsByDate'])->name('site.djs.by-date');
 Route::get('/pages/faq', function () {
