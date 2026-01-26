@@ -48,7 +48,6 @@ Icon
 /public/storage
 /storage/*.key
 /.env
-.env.*
 .phpunit.cache
 
 # Vite / build
