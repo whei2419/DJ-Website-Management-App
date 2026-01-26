@@ -22,6 +22,7 @@ class DJ extends Model
         'video_path',
         'preview_video_path',
         'poster_path',
+        'hls_path',
     ];
 
     public function date()

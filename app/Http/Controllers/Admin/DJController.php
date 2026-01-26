@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\DJ;
 use Illuminate\Support\Facades\Storage;
 use App\Services\VideoPreviewService;
+use App\Jobs\GenerateVideoPreview;
 
 class DJController extends Controller
 {
@@ -87,6 +88,11 @@ class DJController extends Controller
                     $videoPreview = $dj->video_url;
                 }
 
+                $hlsUrl = null;
+                if ($dj->hls_path && Storage::disk('public')->exists($dj->hls_path)) {
+                    $hlsUrl = Storage::disk('public')->url($dj->hls_path);
+                }
+
                 if ($dj->poster_path && Storage::disk('public')->exists($dj->poster_path)) {
                     $posterUrl = Storage::disk('public')->url($dj->poster_path);
                 }
@@ -94,6 +100,7 @@ class DJController extends Controller
                 return [
                     'id' => $dj->id,
                     'video_preview' => $videoPreview,
+                    'hls' => $hlsUrl,
                     'poster' => $posterUrl,
                     'name' => $dj->name,
                         'date' => $dj->date ? ($dj->date->date instanceof \Illuminate\Support\Carbon ? $dj->date->date->format('M d, Y') : '-') : '-',
@@ -142,8 +149,18 @@ class DJController extends Controller
             'date_id' => 'required|integer|exists:dates,id',
             'slot' => 'nullable|string|max:255',
             'visible' => 'sometimes|boolean',
-            'video' => 'required|file|mimetypes:video/mp4,video/quicktime,video/x-msvideo,video/x-ms-wmv,video/webm,video/x-matroska|max:512000', // 500MB
+            'video' => 'nullable|file|mimetypes:video/mp4,video/quicktime,video/x-msvideo,video/x-ms-wmv,video/webm,video/x-matroska|max:512000', // 500MB
+            'video_path' => 'nullable|string'
         ]);
+
+        // Require either a file upload or a pre-uploaded video_path (from chunked upload)
+        if (! $request->hasFile('video') && ! $request->filled('video_path')) {
+            $errorMessage = 'Video is required';
+            if ($request->wantsJson() || $request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => $errorMessage, 'errors' => ['video' => [$errorMessage]]], 422);
+            }
+            return back()->withErrors(['video' => $errorMessage])->withInput();
+        }
 
         // Only persist allowed fields; `slot` is no longer a DB column
         $data = $request->only(['name', 'visible', 'date_id']);
@@ -153,37 +170,21 @@ class DJController extends Controller
             $path = $file->store('djs', 'public');
             $data['video_path'] = $path;
 
-            // Generate preview video and poster
-            $videoService = new VideoPreviewService();
-            $previewPath = $videoService->generatePreview($path);
-            $posterPath = $videoService->generatePoster($path);
-
-            // If preview generation failed, rollback upload and return error
-            if (! $previewPath) {
-                if (Storage::disk('public')->exists($path)) {
-                    Storage::disk('public')->delete($path);
-                }
-
-                $errorMessage = 'Failed to generate preview (FFmpeg required).';
-
-                if ($request->wantsJson() || $request->expectsJson()) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => $errorMessage,
-                        'errors' => ['video' => [$errorMessage]]
-                    ], 422);
-                }
-
-                return back()->withErrors(['video' => $errorMessage])->withInput();
-            }
-
-            $data['preview_video_path'] = $previewPath;
-            if ($posterPath) {
-                $data['poster_path'] = $posterPath;
-            }
+            // Save path now; preview/poster will be generated asynchronously by a job
+        } elseif ($request->filled('video_path')) {
+            // video already uploaded via chunked upload; client sent storage-relative path
+            $data['video_path'] = $request->input('video_path');
         }
 
         $dj = DJ::create($data);
+
+        // Dispatch preview generation job after creating the DJ so it runs in the background
+        try {
+            GenerateVideoPreview::dispatch($dj->id);
+        } catch (\Throwable $e) {
+            // If dispatch fails, log and continue — request should not fail because of background job
+            \Log::error('Failed to dispatch GenerateVideoPreview job', ['error' => $e->getMessage()]);
+        }
 
         // Return JSON for AJAX requests
         if ($request->wantsJson() || $request->expectsJson()) {
@@ -268,17 +269,7 @@ class DJController extends Controller
             $path = $file->store('djs', 'public');
             $data['video_path'] = $path;
 
-            // Generate new preview video and poster
-            $videoService = new VideoPreviewService();
-            $previewPath = $videoService->generatePreview($path);
-            $posterPath = $videoService->generatePoster($path);
-
-            if ($previewPath) {
-                $data['preview_video_path'] = $previewPath;
-            }
-            if ($posterPath) {
-                $data['poster_path'] = $posterPath;
-            }
+            // Don't generate previews synchronously here; dispatch job after update to avoid timeouts
         }
 
         if ($request->filled('video_url')) {
@@ -286,6 +277,15 @@ class DJController extends Controller
         }
 
         $dj->update($data);
+
+        // If a new video was uploaded, dispatch preview generation job
+        if ($request->hasFile('video')) {
+            try {
+                GenerateVideoPreview::dispatch($dj->id);
+            } catch (\Throwable $e) {
+                \Log::error('Failed to dispatch GenerateVideoPreview job on update', ['error' => $e->getMessage(), 'dj_id' => $dj->id]);
+            }
+        }
 
         return redirect()->route('admin.djs.index')->with('success', 'DJ information updated successfully.');
     }

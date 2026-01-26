@@ -139,6 +139,67 @@ class VideoPreviewService
     }
 
     /**
+     * Generate HLS playlist and segments for adaptive playback.
+     * Stores files under public disk (e.g. storage/app/public/hls/{uploadId}/playlist.m3u8)
+     *
+     * @param string $videoPath
+     * @param string $outputDirRelative Relative directory under public disk (e.g. "hls/{id}")
+     * @return string|null Relative path to playlist (public disk) or null
+     */
+    public function generateHls(string $videoPath, string $outputDirRelative): ?string
+    {
+        try {
+            $ffmpeg = $this->getFfmpegBinary();
+            if (!$ffmpeg) {
+                Log::warning('FFmpeg not available, skipping HLS generation');
+                return null;
+            }
+
+            $fullPath = Storage::disk('public')->path($videoPath);
+
+            $outputDir = Storage::disk('public')->path($outputDirRelative);
+            if (!is_dir($outputDir)) {
+                mkdir($outputDir, 0755, true);
+            }
+
+            $playlistName = 'playlist.m3u8';
+            $playlistFull = $outputDir . DIRECTORY_SEPARATOR . $playlistName;
+            $segmentPattern = $outputDir . DIRECTORY_SEPARATOR . 'segment_%03d.ts';
+
+            // Example single-bitrate HLS generation (modify for multi-bitrate if needed)
+            $process = new Process([
+                $ffmpeg,
+                '-i', $fullPath,
+                '-preset', 'fast',
+                '-g', '48',
+                '-sc_threshold', '0',
+                '-hls_time', '10',
+                '-hls_list_size', '0',
+                '-hls_segment_filename', $segmentPattern,
+                '-y',
+                $playlistFull
+            ]);
+
+            // Allow longer time for HLS generation
+            $process->setTimeout(900); // 15 minutes
+            $process->run();
+
+            if (!$process->isSuccessful()) {
+                Log::error('HLS generation failed', [
+                    'error' => $process->getErrorOutput(),
+                    'video_path' => $videoPath
+                ]);
+                return null;
+            }
+
+            return rtrim($outputDirRelative, '/') . '/' . $playlistName;
+        } catch (\Exception $e) {
+            Log::error('HLS generation exception', ['error' => $e->getMessage(), 'video_path' => $videoPath]);
+            return null;
+        }
+    }
+
+    /**
      * Check if FFmpeg is available on the system
      *
      * @return bool

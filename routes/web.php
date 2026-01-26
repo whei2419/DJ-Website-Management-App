@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\DateController as AdminDateController;
 //Add import for SiteController
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\UploadController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -67,6 +68,9 @@ Route::middleware('auth')->group(function () {
         'update' => 'admin.dates.update',
         'destroy' => 'admin.dates.destroy',
     ]);
+    // Chunked upload endpoints (for large file uploads)
+    Route::post('/upload/chunk', [UploadController::class, 'receiveChunk'])->name('upload.chunk');
+    Route::post('/upload/complete', [UploadController::class, 'completeUpload'])->name('upload.complete');
     // Admin DJs for AJAX (moved to API routes)
 });
 

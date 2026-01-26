@@ -42,6 +42,16 @@
                                         accept="video/*" required>
                                 </div>
                                 <small class="error-message"></small>
+
+                                <!-- Inline progress UI (hidden until upload starts) -->
+                                <div id="uploadInlineProgress" class="mb-3 d-none">
+                                    <div class="progress">
+                                        <div id="uploadInlineProgressBar" class="progress-bar" role="progressbar"
+                                            style="width: 0%;">0%</div>
+                                    </div>
+                                    <div id="uploadInlineProgressText" class="text-muted small mt-1">Preparing upload...
+                                    </div>
+                                </div>
                             </div>
                             <div class="mb-3 form-check">
                                 <input type="checkbox" class="form-check-input" id="djVisible" name="visible" value="1"
@@ -58,6 +68,8 @@
                 </div>
             </div>
         </div>
+
+        <!-- Inline upload progress (shown inside add/edit modal) -->
 
         <!-- Delete Confirmation Modal -->
         <div class="modal modal-blur fade" id="deleteDJModal" tabindex="-1" role="dialog" aria-hidden="true">
@@ -80,102 +92,188 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <div class="w-100">
-                            <div class="row">
-                                <div class="col">
-                                    <button type="button" class="btn w-100" data-bs-dismiss="modal">Cancel</button>
+                        <div class="mb-3">
+                            <label for="video" class="form-label">Video Preview</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-video"></i></span>
+                                <!-- Uppy uploader placeholder -->
+                                <div id="uploader" style="width:100%;"></div>
+                            </div>
+                            <small class="error-message"></small>
+
+                            <!-- Inline progress UI (hidden until upload starts) -->
+                            <div id="uploadInlineProgress" class="mb-3 d-none">
+                                <div class="progress">
+                                    <div id="uploadInlineProgressBar" class="progress-bar" role="progressbar"
+                                        style="width: 0%;">0%</div>
                                 </div>
-                                <div class="col">
-                                    <button type="button" id="confirmDeleteBtn" class="btn btn-danger w-100">Delete
-                                        DJ</button>
-                                </div>
+                                <div id="uploadInlineProgressText" class="text-muted small mt-1">Preparing upload...</div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {{-- Content start here --}}
-        <div class="container-xl">
-            <div class="page-body">
-                <div class="row row-deck row-cards w-100">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-table">
-                                <div class="card-header">
-                                    <div class="row align-items-center">
-                                        <div class="col-auto">
-                                            <h3 class="card-title mb-0">DJ table</h3>
-                                        </div>
-                                        <div class="col-auto ms-auto">
-                                            <div class="d-flex align-items-center gap-2">
-                                                <div class="d-flex align-items-center">
-                                                    <span class="me-2">Show</span>
-                                                    <select id="djsTableLength" class="form-select form-select-sm"
-                                                        style="width: auto;">
-                                                        <option value="10">10</option>
-                                                        <option value="20" selected>20</option>
-                                                        <option value="50">50</option>
-                                                        <option value="100">100</option>
-                                                    </select>
-                                                    <span class="ms-2">entries</span>
+                        <div class="container-xl">
+                            <div class="page-body">
+                                <div class="row row-deck row-cards w-100">
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-table">
+                                                <div class="card-header">
+                                                    <div class="row align-items-center">
+                                                        <div class="col-auto">
+                                                            <h3 class="card-title mb-0">DJ table</h3>
+                                                        </div>
+                                                        <div class="col-auto ms-auto">
+                                                            <div class="d-flex align-items-center gap-2">
+                                                                <div class="d-flex align-items-center">
+                                                                    <span class="me-2">Show</span>
+                                                                    <select id="djsTableLength"
+                                                                        class="form-select form-select-sm"
+                                                                        style="width: auto;">
+                                                                        <option value="10">10</option>
+                                                                        <option value="20" selected>20</option>
+                                                                        <option value="50">50</option>
+                                                                        <option value="100">100</option>
+                                                                    </select>
+                                                                    <span class="ms-2">entries</span>
+                                                                </div>
+                                                                <input type="text" id="djsTableSearch"
+                                                                    class="form-control form-control-sm"
+                                                                    placeholder="Search DJs..." style="width: 250px;">
+                                                                <a href="#" id="addOpen"
+                                                                    class="btn btn-primary btn-sm d-flex align-items-center"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#addEditDJModal"><i
+                                                                        class="fas fa-plus me-2"></i> Add DJ</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <input type="text" id="djsTableSearch"
-                                                    class="form-control form-control-sm" placeholder="Search DJs..."
-                                                    style="width: 250px;">
-                                                <a href="#" id="addOpen"
-                                                    class="btn btn-primary btn-sm d-flex align-items-center"
-                                                    data-bs-toggle="modal" data-bs-target="#addEditDJModal"><i
-                                                        class="fas fa-plus me-2"></i> Add DJ</a>
+                                                <div id="advanced-table">
+                                                    <div class="table-responsive">
+                                                        <table id="djsTable" class="table table-vcenter">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>ID</th>
+                                                                    <th>Video Preview</th>
+                                                                    <th>Name</th>
+                                                                    <th>Date</th>
+                                                                    <th>Visible</th>
+                                                                    <th>Action</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody class="table-tbody">
+                                                                <tr>
+                                                                    <td colspan="6" class="text-center py-4">
+                                                                        <div class="spinner-border spinner-border-sm me-2"
+                                                                            role="status">
+                                                                        </div>
+                                                                        <span class="text-muted">Loading DJs...</span>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                                <div id="advanced-table">
-                                    <div class="table-responsive">
-                                        <table id="djsTable" class="table table-vcenter">
-                                            <thead>
-                                                <tr>
-                                                    <th>ID</th>
-                                                    <th>Video Preview</th>
-                                                    <th>Name</th>
-                                                    <th>Date</th>
-                                                    <th>Visible</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody class="table-tbody">
-                                                <tr>
-                                                    <td colspan="6" class="text-center py-4">
-                                                        <div class="spinner-border spinner-border-sm me-2" role="status">
-                                                        </div>
-                                                        <span class="text-muted">Loading DJs...</span>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+
                                     </div>
                                 </div>
                             </div>
                         </div>
-
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-@endsection
+                @endsection
 
-@push('scripts')
-    <!-- DataTables -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
-    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
-    <script>
-        const djsDataRoute = "{{ route('admin.djs.list') }}";
-        const saveDJRoute = "{{ route('admin.djs.store') }}";
-        const availableDatesRoute = "{{ route('admin.djs.available-dates') }}";
-    </script>
-    @vite(['resources/js/admin-djs-datatables.js'])
-@endpush
+                @push('scripts')
+                    <!-- DataTables -->
+                    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+                    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+                    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+                    <script>
+                        const djsDataRoute = "{{ route('admin.djs.list') }}";
+                        const saveDJRoute = "{{ route('admin.djs.store') }}";
+                        const availableDatesRoute = "{{ route('admin.djs.available-dates') }}";
+                    </script>
+                    <!-- Uppy (client-side uploader) -->
+                    <link href="https://releases.transloadit.com/uppy/v3.8.0/uppy.min.css" rel="stylesheet" />
+                    <script src="https://releases.transloadit.com/uppy/v3.8.0/uppy.min.js"></script>
+                    <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
+                    <script>
+                        // Initialize Uppy dashboard and store instance in window.uppy
+                        const initUppy = () => {
+                            if (window.uppy) return window.uppy;
+                            const uppy = new Uppy.Core({
+                                autoProceed: false,
+                                restrictions: {
+                                    maxFileSize: 1000 * 1024 * 1024,
+                                    allowedFileTypes: ['video/*']
+                                }
+                            });
+
+                            uppy.use(Uppy.Dashboard, {
+                                inline: true,
+                                target: '#uploader',
+                                showProgressDetails: true
+                            });
+
+                            // Do not attach an uploader plugin; we'll use our own chunked function
+                            window.uppy = uppy;
+                            return uppy;
+                        };
+                        document.addEventListener('DOMContentLoaded', initUppy);
+
+                        // Chunked upload helper
+                        async function uploadFileInChunks(file, onProgress = null) {
+                            const chunkSize = 5 * 1024 * 1024; // 5MB
+                            const totalChunks = Math.ceil(file.size / chunkSize);
+                            const uploadId = crypto.randomUUID();
+
+                            for (let i = 0; i < totalChunks; i++) {
+                                const start = i * chunkSize;
+                                const end = Math.min(file.size, start + chunkSize);
+                                const chunk = file.slice(start, end);
+                                const form = new FormData();
+                                form.append('upload_id', uploadId);
+                                form.append('chunk_index', i + 1);
+                                form.append('chunk', chunk);
+
+                                let ok = false;
+                                let retries = 0;
+                                while (!ok && retries < 3) {
+                                    const resp = await fetch('{{ route('upload.chunk') }}', {
+                                        method: 'POST',
+                                        body: form,
+                                        headers: {
+                                            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').getAttribute(
+                                                'content')
+                                        }
+                                    });
+                                    if (resp.ok) ok = true;
+                                    else retries++;
+                                }
+
+                                if (!ok) throw new Error('Failed to upload chunk ' + (i + 1));
+
+                                if (onProgress) onProgress(Math.round(((i + 1) / totalChunks) * 100));
+                            }
+
+                            // Ask server to assemble
+                            const completeResp = await fetch('{{ route('upload.complete') }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+                                },
+                                body: JSON.stringify({
+                                    upload_id: uploadId,
+                                    total_chunks: totalChunks,
+                                    filename: file.name
+                                })
+                            });
+                            if (!completeResp.ok) throw new Error('Failed to complete upload');
+                            return await completeResp.json();
+                        }
+
+                        // Form submission and upload are handled centrally in `resources/js/admin-djs-datatables.js`.
+                    </script>
+                    @vite(['resources/js/admin-djs-datatables.js'])
+                @endpush

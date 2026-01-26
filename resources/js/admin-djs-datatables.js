@@ -38,23 +38,29 @@ document.addEventListener('DOMContentLoaded', () => {
                     orderable: false,
                     searchable: false,
                     render: function (data, type, row) {
-                        if (data) {
-                            const poster = row.poster ? `poster="${row.poster}"` : '';
-                            const videoId = `video-${row.id}`;
-                            return `<div style="position: relative; width: 100px; height: 75px; border-radius: 4px; overflow: hidden;">
-                                <video id="${videoId}" 
-                                       style="width: 100%; height: 100%; object-fit: cover;" 
-                                       preload="auto"
-                                       ${poster}
-                                       autoplay
-                                       muted 
-                                       loop 
-                                       playsinline>
-                                    <source src="${data}" type="video/webm">
-                                    <source src="${data}" type="video/mp4">
-                                </video>
-                            </div>`;
-                        }
+                            if (data || row.hls) {
+                                const poster = row.poster ? `poster="${row.poster}"` : '';
+                                const videoId = `video-${row.id}`;
+                                // If HLS is available prefer HLS playback
+                                if (row.hls) {
+                                    return `<div style="position: relative; width: 100px; height: 75px; border-radius: 4px; overflow: hidden;">
+                                        <video id="${videoId}" data-hls="${row.hls}" style="width:100%;height:100%;object-fit:cover;" controls muted playsinline></video>
+                                    </div>`;
+                                }
+                                return `<div style="position: relative; width: 100px; height: 75px; border-radius: 4px; overflow: hidden;">
+                                    <video id="${videoId}" 
+                                           style="width: 100%; height: 100%; object-fit: cover;" 
+                                           preload="auto"
+                                           ${poster}
+                                           autoplay
+                                           muted 
+                                           loop 
+                                           playsinline>
+                                        <source src="${data}" type="video/webm">
+                                        <source src="${data}" type="video/mp4">
+                                    </video>
+                                </div>`;
+                            }
                         return '<span class="avatar avatar-sm" style="background-color: var(--tblr-muted-bg);"><i class="fas fa-video text-muted"></i></span>';
                     }
                 },
@@ -138,6 +144,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize DataTable on load
     initDataTable();
+
+    // After each draw attach HLS.js to any video elements with data-hls
+    $('#djsTable').on('draw.dt', function () {
+        document.querySelectorAll('video[data-hls]').forEach(video => {
+            const hlsUrl = video.getAttribute('data-hls');
+            if (!hlsUrl) return;
+            try {
+                if (window.Hls && window.Hls.isSupported()) {
+                    const hls = new window.Hls();
+                    hls.loadSource(hlsUrl);
+                    hls.attachMedia(video);
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = hlsUrl;
+                }
+            } catch (e) {
+                console.error('HLS attach failed', e);
+            }
+        });
+    });
 
     // Wire up custom search input
     const searchInput = document.getElementById('djsTableSearch');
@@ -241,13 +266,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // handle form submission
-    saveDJButton.addEventListener('click', (e) => {
+    saveDJButton.addEventListener('click', async (e) => {
         e.preventDefault();
-        saveOrUpdateDJ(true);
+        await saveOrUpdateDJ(true);
     });
 
     // save/update dj via AJAX
-    function saveOrUpdateDJ(isAdd, djId = null) {
+    async function saveOrUpdateDJ(isAdd, djId = null) {
         // gather form data
         const formData = new FormData();
         formData.append('name', nameInput.value);
@@ -260,10 +285,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (visibleInput) {
             formData.append('visible', visibleInput.checked ? 1 : 0);
         }
-        // append file object for video if present
-        if (videoInput && videoInput.files && videoInput.files.length > 0) {
-            formData.append('video', videoInput.files[0]);
-        }
+        // Note: do not append file here. If an Uppy file is present we'll upload it via chunking
+        // and set `video_path` on the formData. If a native file exists, the existing XHR
+        // upload behavior below will include it.
 
         // log form data for debugging
         console.log('Form Data:', {
@@ -277,33 +301,112 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // submit via fetch; request JSON to ensure Laravel returns JSON for validation/errors
-        fetch(saveUrl, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'Accept': 'application/json'
-            }
-        })
-            .then(async (response) => {
-                const contentType = response.headers.get('content-type') || '';
-                if (contentType.includes('application/json')) {
-                    const data = await response.json();
-                    return { ok: response.ok, status: response.status, data };
+        // Determine if an Uppy file is present
+        let uppyFile = null;
+        if (window.uppy && window.uppy.getFiles().length > 0) {
+            uppyFile = window.uppy.getFiles()[0];
+        }
+
+        // If Uppy file present, perform chunked upload first and attach video_path
+        if (uppyFile) {
+            try {
+                showUploadProgressModal();
+                // Construct a File object for chunking
+                let fileObj;
+                try {
+                    fileObj = new File([uppyFile.data], uppyFile.name, { type: uppyFile.type });
+                } catch (e) {
+                    fileObj = uppyFile.data;
+                    fileObj.name = uppyFile.name || fileObj.name || 'upload';
                 }
-                // not JSON: capture text for debugging (likely an HTML error/redirect)
-                const text = await response.text();
-                throw new Error(`Non-JSON response (status ${response.status}): ${text}`);
-            })
-            .then(({ ok, data }) => {
-                if (ok && data.success) {
-                    console.log('DJ saved successfully:', data.dj);
 
-                    // Show success toast
+                const result = await uploadFileInChunks(fileObj, (pct) => updateUploadProgress(pct));
+                // Attach server-side path returned by assemble endpoint
+                formData.append('video_path', result.path);
+
+                // Now submit form without file (server will use video_path)
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', saveUrl, true);
+                xhr.setRequestHeader('X-CSRF-TOKEN', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+                xhr.setRequestHeader('Accept', 'application/json');
+
+                // minimal progress for final POST
+                if (xhr.upload) {
+                    xhr.upload.onprogress = function (event) {
+                        if (event.lengthComputable) {
+                            const percent = Math.round((event.loaded / event.total) * 100);
+                            updateUploadProgress(percent);
+                        }
+                    };
+                }
+
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                        updateUploadProgress(100);
+                        let parsed = {};
+                        try { parsed = JSON.parse(xhr.responseText || '{}'); } catch (e) {}
+
+                        if (xhr.status >= 200 && xhr.status < 300 && parsed.success) {
+                            showToast('Success!', 'DJ saved successfully', 'success');
+                            try { const modal = bootstrap.Modal.getInstance(addOpen); if (modal) modal.hide(); } catch (e) {}
+                            if (form) form.reset(); if (dateIdInput) dateIdInput.value = ''; document.querySelectorAll('.date-card').forEach(c => c.classList.remove('selected'));
+                            djTable.ajax.reload(); fetchAvailableDates();
+                        } else {
+                            if (parsed && parsed.errors) displayErrors(parsed.errors);
+                            else showToast('Error', parsed.message || 'Failed to save DJ', 'error');
+                        }
+
+                        hideUploadProgressModal();
+                        // reset Uppy
+                        try { window.uppy.reset(); } catch (e) {}
+                    }
+                };
+
+                xhr.onerror = function () { showToast('Error', 'An error occurred while saving the DJ', 'error'); hideUploadProgressModal(); };
+                xhr.send(formData);
+            } catch (err) {
+                showToast('Error', err.message || 'Upload failed', 'error');
+                hideUploadProgressModal();
+            }
+            return;
+        }
+
+        // No Uppy file — proceed with original XHR upload path (native file or no file)
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', saveUrl, true);
+        xhr.setRequestHeader('X-CSRF-TOKEN', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+        xhr.setRequestHeader('Accept', 'application/json');
+
+        // Show upload modal
+        showUploadProgressModal();
+
+        // Track upload progress
+        if (xhr.upload) {
+            xhr.upload.onprogress = function (event) {
+                if (event.lengthComputable) {
+                    const percent = Math.round((event.loaded / event.total) * 100);
+                    updateUploadProgress(percent);
+                }
+            };
+        }
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                // Hide progress modal once finished
+                updateUploadProgress(100);
+
+                let parsed = null;
+                try {
+                    parsed = JSON.parse(xhr.responseText || '{}');
+                } catch (e) {
+                    console.error('Non-JSON response:', xhr.responseText);
+                    showToast('Error', 'Server returned unexpected response', 'error');
+                    hideUploadProgressModal();
+                    return;
+                }
+
+                if (xhr.status >= 200 && xhr.status < 300 && parsed.success) {
                     showToast('Success!', 'DJ saved successfully', 'success');
-
-                    // Close the modal
                     try {
                         const modal = bootstrap.Modal.getInstance(addOpen);
                         if (modal) {
@@ -315,29 +418,38 @@ document.addEventListener('DOMContentLoaded', () => {
                         console.error('Error closing modal:', e);
                     }
 
-                    // Reset form
+                    // Reset form and reload
                     if (form) form.reset();
                     if (dateIdInput) dateIdInput.value = '';
                     document.querySelectorAll('.date-card').forEach(c => c.classList.remove('selected'));
-
-                    // Reload both the DJ list and available dates
                     djTable.ajax.reload();
                     fetchAvailableDates();
                 } else {
-                    // validation errors or other errors
-                    if (data.errors) {
-                        displayErrors(data.errors);
-                    } else if (data.message) {
-                        showToast('Error', data.message, 'error');
+                    if (parsed && parsed.errors) {
+                        displayErrors(parsed.errors);
+                    } else if (parsed && parsed.message) {
+                        showToast('Error', parsed.message, 'error');
                     } else {
                         showToast('Error', 'Failed to save DJ', 'error');
                     }
                 }
-            })
-            .catch((error) => {
-                console.error('Error saving DJ:', error);
-                showToast('Error', 'An error occurred while saving the DJ', 'error');
-            });
+
+                hideUploadProgressModal();
+            }
+        };
+
+        xhr.onerror = function (err) {
+            console.error('Upload error:', err);
+            showToast('Error', 'An error occurred while saving the DJ', 'error');
+            hideUploadProgressModal();
+        };
+
+        // append native file if exists
+        if (videoInput && videoInput.files && videoInput.files.length > 0) {
+            formData.append('video', videoInput.files[0]);
+        }
+
+        xhr.send(formData);
     }
 
     function validateForm() {
@@ -354,8 +466,12 @@ document.addEventListener('DOMContentLoaded', () => {
             showFieldError(dateIdInput, 'Please select a date');
             isValid = false;
         }
-        if (!videoInput.files || videoInput.files.length === 0) {
-            showFieldError(videoInput, 'Video is required');
+        const hasNativeFile = videoInput && videoInput.files && videoInput.files.length > 0;
+        const hasUppyFile = window.uppy && window.uppy.getFiles && window.uppy.getFiles().length > 0;
+        if (!hasNativeFile && !hasUppyFile) {
+            // prefer to attach error to uploader if present, otherwise video input
+            const fieldEl = document.getElementById('uploader') || videoInput;
+            showFieldError(fieldEl, 'Video is required');
             isValid = false;
         }
 
@@ -408,6 +524,61 @@ document.addEventListener('DOMContentLoaded', () => {
             window.adminToaster.show(type, message);
         }
     };
+
+    // Upload progress modal helpers
+    function showUploadProgressModal() {
+        // Prefer inline progress container if available
+        const inline = document.getElementById('uploadInlineProgress');
+        if (inline) {
+            inline.classList.remove('d-none');
+            updateUploadProgress(0);
+            return;
+        }
+
+        // Fallback to legacy modal if present
+        const modalEl = document.getElementById('uploadProgressModal');
+        if (modalEl) {
+            try {
+                const modal = new bootstrap.Modal(modalEl, { backdrop: 'static', keyboard: false });
+                updateUploadProgress(0);
+                modal.show();
+            } catch (e) {
+                console.warn('Could not show upload progress modal', e);
+            }
+        }
+    }
+
+    function updateUploadProgress(percent) {
+        // Try inline bar first, then fallback to modal bar
+        const bar = document.getElementById('uploadInlineProgressBar') || document.getElementById('uploadProgressBar');
+        const text = document.getElementById('uploadInlineProgressText') || document.getElementById('uploadProgressText');
+        if (bar) {
+            bar.style.width = percent + '%';
+            bar.textContent = percent + '%';
+        }
+        if (text) {
+            if (percent < 100) text.textContent = `Uploading... ${percent}%`;
+            else text.textContent = `Finalizing...`;
+        }
+    }
+
+    function hideUploadProgressModal() {
+        const inline = document.getElementById('uploadInlineProgress');
+        if (inline) {
+            inline.classList.add('d-none');
+            return;
+        }
+
+        const modalEl = document.getElementById('uploadProgressModal');
+        if (modalEl) {
+            try {
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+            } catch (e) {
+                // ignore
+            }
+        }
+    }
 
     // Edit DJ function
     window.editDJ = function (id) {
