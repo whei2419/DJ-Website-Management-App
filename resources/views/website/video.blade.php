@@ -47,11 +47,43 @@
 
 <body>
     <div class="video-wrap">
-        @if (!empty($videoUrl))
-            <video controls playsinline poster="{{ $posterUrl ?? '' }}">
-                <source src="{{ $videoUrl }}" type="video/mp4">
+        @if (!empty($hlsUrl) || !empty($videoUrl))
+            <video id="sharedVideo" controls playsinline poster="{{ $posterUrl ?? '' }}">
+                @if (empty($hlsUrl) && !empty($videoUrl))
+                    <source src="{{ $videoUrl }}" type="video/mp4">
+                @endif
                 Your browser does not support the video tag.
             </video>
+            <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
+            <script>
+                (function() {
+                    const hlsUrl = @json($hlsUrl ?? null);
+                    const fallback = @json($videoUrl ?? null);
+                    const video = document.getElementById('sharedVideo');
+                    if (!video) return;
+
+                    if (hlsUrl) {
+                        try {
+                            if (window.Hls && window.Hls.isSupported()) {
+                                const hls = new window.Hls();
+                                hls.loadSource(hlsUrl);
+                                hls.attachMedia(video);
+                            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                                video.src = hlsUrl;
+                            } else if (fallback) {
+                                video.src = fallback;
+                            }
+                        } catch (e) {
+                            console.error('HLS playback error, falling back:', e);
+                            if (fallback) video.src = fallback;
+                        }
+                    }
+                    try {
+                        video.load();
+                    } catch (e) {
+                        /* ignore */ }
+                })();
+            </script>
         @else
             <div class="msg">
                 <p>Video not available.</p>

@@ -234,6 +234,9 @@
                     <!-- DJ cards will be dynamically inserted here by gallery.js -->
                     <p class="loading-message">Loading performances...</p>
                 </div>
+
+                <!-- hls.js for HLS playback in the gallery modal -->
+                <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
             </div>
 
             <button class="cards-arrow right" aria-label="Next performance">

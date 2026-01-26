@@ -445,11 +445,42 @@ function openDJModal(dj) {
 
     // Set video in modal
     const modalVideo = modalEl.querySelector('.selected-vide');
-    const fullVideoSrc = dj.video_path ? `/storage/${dj.video_path}` : (dj.preview_video_path ? `/storage/${dj.preview_video_path}` : '');
+    // Prefer HLS stream if available (dj.hls_path)
+    const hlsUrl = dj.hls_path ? `/storage/${dj.hls_path}` : null;
+    const fallbackFull = dj.video_path ? `/storage/${dj.video_path}` : (dj.preview_video_path ? `/storage/${dj.preview_video_path}` : '');
+
     if (modalVideo) {
-        modalVideo.src = fullVideoSrc;
         modalVideo.controls = true;
         modalVideo.poster = dj.poster_path ? `/storage/${dj.poster_path}` : '';
+
+        if (hlsUrl) {
+            // Use hls.js when supported
+            try {
+                if (window.Hls && window.Hls.isSupported()) {
+                    // detach any previous hls instance stored on the element
+                    if (modalVideo._hlsInstance) {
+                        try { modalVideo._hlsInstance.destroy(); } catch (e) { /* ignore */ }
+                        modalVideo._hlsInstance = null;
+                    }
+                    const hls = new window.Hls();
+                    modalVideo._hlsInstance = hls;
+                    hls.loadSource(hlsUrl);
+                    hls.attachMedia(modalVideo);
+                } else if (modalVideo.canPlayType('application/vnd.apple.mpegurl')) {
+                    // Native HLS (Safari, iOS)
+                    modalVideo.src = hlsUrl;
+                } else {
+                    // Fallback to progressive file
+                    modalVideo.src = fallbackFull;
+                }
+            } catch (e) {
+                console.error('HLS setup failed, falling back to file:', e);
+                modalVideo.src = fallbackFull;
+            }
+        } else {
+            modalVideo.src = fallbackFull;
+        }
+
         try { modalVideo.load(); } catch (e) { /* ignore */ }
     }
 

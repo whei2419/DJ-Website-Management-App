@@ -57,10 +57,17 @@ class SiteController extends Controller
         try {
             $dj = DJ::findOrFail($id);
 
-            // Determine source URL (prefer stored file)
+            // Determine source URLs (prefer HLS, then stored file)
             $videoUrl = null;
             $posterUrl = null;
+            $hlsUrl = null;
 
+            // Prefer HLS stream if available
+            if ($dj->hls_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($dj->hls_path)) {
+                $hlsUrl = Storage::disk('public')->url($dj->hls_path);
+            }
+
+            // Fall back to stored progressive files
             if ($dj->video_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($dj->video_path)) {
                 $videoUrl = Storage::disk('public')->url($dj->video_path);
             } elseif ($dj->preview_video_path && Storage::disk('public')->exists($dj->preview_video_path)) {
@@ -73,7 +80,7 @@ class SiteController extends Controller
                 $posterUrl = Storage::disk('public')->url($dj->poster_path);
             }
 
-            return view('website.video', compact('dj', 'videoUrl', 'posterUrl'));
+            return view('website.video', compact('dj', 'videoUrl', 'posterUrl', 'hlsUrl'));
         } catch (\Throwable $e) {
             \Log::error('Failed to show shared video', ['id' => $id, 'error' => $e->getMessage()]);
             abort(404);
