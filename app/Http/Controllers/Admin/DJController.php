@@ -167,7 +167,26 @@ class DJController extends Controller
 
         if ($request->hasFile('video')) {
             $file = $request->file('video');
-            $path = $file->store('djs', 'public');
+
+            // Organize uploads by event date (fall back to today)
+            $uploadDate = null;
+            if ($request->filled('date_id')) {
+                $dateModel = \App\Models\Date::find($request->input('date_id'));
+                if ($dateModel && isset($dateModel->date) && $dateModel->date instanceof \Illuminate\Support\Carbon) {
+                    $uploadDate = $dateModel->date->format('Y-m-d');
+                } elseif ($dateModel && isset($dateModel->date)) {
+                    $uploadDate = (string) $dateModel->date;
+                }
+            }
+            $subdir = 'djs/' . ($uploadDate ?? now()->format('Y-m-d'));
+
+            // Create a safe, unique filename: original_name_timestamp.ext
+            $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $ext = $file->getClientOriginalExtension();
+            $safe = preg_replace('/[^A-Za-z0-9-_]/', '_', $originalName);
+            $filename = $safe . '_' . time() . '.' . $ext;
+
+            $path = $file->storeAs($subdir, $filename, 'public');
             $data['video_path'] = $path;
 
             // Save path now; preview/poster will be generated asynchronously by a job
@@ -266,7 +285,25 @@ class DJController extends Controller
             }
             
             $file = $request->file('video');
-            $path = $file->store('djs', 'public');
+
+            // Organize uploads by DJ event date (fall back to DJ's date or today)
+            $uploadDate = null;
+            if (!empty($dj->date) && isset($dj->date->date) && $dj->date->date instanceof \Illuminate\Support\Carbon) {
+                $uploadDate = $dj->date->date->format('Y-m-d');
+            } elseif ($request->filled('date_id')) {
+                $dateModel = \App\Models\Date::find($request->input('date_id'));
+                if ($dateModel && isset($dateModel->date) && $dateModel->date instanceof \Illuminate\Support\Carbon) {
+                    $uploadDate = $dateModel->date->format('Y-m-d');
+                }
+            }
+            $subdir = 'djs/' . ($uploadDate ?? now()->format('Y-m-d'));
+
+            $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $ext = $file->getClientOriginalExtension();
+            $safe = preg_replace('/[^A-Za-z0-9-_]/', '_', $originalName);
+            $filename = $safe . '_' . time() . '.' . $ext;
+
+            $path = $file->storeAs($subdir, $filename, 'public');
             $data['video_path'] = $path;
 
             // Don't generate previews synchronously here; dispatch job after update to avoid timeouts
