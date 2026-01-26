@@ -22,6 +22,9 @@ document.addEventListener('DOMContentLoaded', () => {
             ajax: {
                 url: djsDataRoute,
                 type: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                },
                 data: function (d) {
                     return {
                         draw: d.draw,

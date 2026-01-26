@@ -42,7 +42,7 @@ class UploadController extends Controller
             return response()->json(['error' => 'no such upload'], 404);
         }
 
-        $publicDir = storage_path('app/previews');
+        $publicDir = storage_path('app/public/djs/previews');
         if (!is_dir($publicDir)) {
             mkdir($publicDir, 0755, true);
         }
@@ -69,7 +69,8 @@ class UploadController extends Controller
         @rmdir($tmpDir);
 
         // Return storage-relative path so callers can reference it (e.g. save in DB)
-        $storageRelative = 'previews/' . $finalName;
+        // This path must be relative to the 'public' disk root (storage/app/public)
+        $storageRelative = 'djs/previews/' . $finalName;
 
         return response()->json(['path' => $storageRelative]);
     }
