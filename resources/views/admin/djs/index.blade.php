@@ -239,10 +239,20 @@
         document.addEventListener('DOMContentLoaded', initUppy);
 
         // Chunked upload helper
+        function generateUUID() {
+            // RFC4122 version 4 compliant UUID generator (fallback)
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
         async function uploadFileInChunks(file, onProgress = null) {
             const chunkSize = 5 * 1024 * 1024; // 5MB
             const totalChunks = Math.ceil(file.size / chunkSize);
-            const uploadId = crypto.randomUUID();
+            const uploadId = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() :
+        generateUUID();
 
             for (let i = 0; i < totalChunks; i++) {
                 const start = i * chunkSize;
