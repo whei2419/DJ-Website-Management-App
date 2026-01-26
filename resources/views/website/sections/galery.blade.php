@@ -255,19 +255,12 @@
                 <div class="modal-header">
                     <h1 class="modal-title fs-5 dj-name" id="exampleModalLabel">DJ Performance</h1>
                     <div class="ms-auto d-flex gap-2 align-items-center">
-                        <button type="button" id="modalDownloadBtn" class="btn btn-outline-secondary btn-sm"
-                            title="Download preview" aria-label="Download preview">
-                            <i class="fas fa-download" aria-hidden="true"></i>
-                        </button>
-                        <button type="button" id="modalCopyBtn" class="btn btn-outline-secondary btn-sm"
+                        <button type="button" id="modalCopyBtn" class="btn btn-outline-light btn-sm"
                             title="Copy share link" aria-label="Copy share link">
                             <i class="fas fa-link" aria-hidden="true"></i>
                         </button>
-                        <button type="button" id="modalShareBtn" class="btn btn-outline-primary btn-sm" title="Share"
-                            aria-label="Share">
-                            <i class="fas fa-share-alt" aria-hidden="true"></i>
-                        </button>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
                     </div>
                 </div>
                 <div class="modal-body">
@@ -276,4 +269,39 @@
             </div>
         </div>
     </div>
+
+    <style>
+        /* Glass modal style for gallery */
+        .modal-content {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px) saturate(120%);
+            -webkit-backdrop-filter: blur(10px) saturate(120%);
+            color: #fff;
+        }
+
+        .modal-header,
+        .modal-body {
+            background: transparent;
+            border: none;
+        }
+
+        .modal-title.dj-name {
+            font-weight: 600;
+        }
+
+        .btn-outline-light {
+            color: rgba(255, 255, 255, 0.9);
+            border-color: rgba(255, 255, 255, 0.12);
+            background: transparent;
+        }
+
+        .btn-close-white {
+            filter: invert(1) grayscale(1) contrast(200%);
+        }
+
+        .modal-backdrop.show {
+            background-color: rgba(0, 0, 0, 0.55);
+        }
+    </style>
 </div>
