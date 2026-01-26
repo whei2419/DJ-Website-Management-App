@@ -6,7 +6,7 @@
 
     <div class="page-wrapper">
         <div class="modal" id="addEditDJModal" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 id="DjTitle" class="modal-title"></h5>
@@ -15,49 +15,57 @@
                     <div class="modal-body">
                         <form id="addEditDJForm" action="" method="POST" enctype="multipart/form-data">
                             @csrf
-                            <div class="mb-3">
-                                <label for="name" class="form-label">Name</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                    <input type="text" class="form-control" id="djName" name="name" required>
-                                </div>
-                                <small class="error-message"></small>
-                            </div>
-                            <input type="hidden" id="djDateId" name="date_id">
-                            <div class="mb-3">
-                                <label class="form-label">Assigned Date</label>
-                                <div id="dateGrid" class="date-grid">
-                                    <div class="text-center text-muted py-3">
-                                        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-                                        Loading available dates...
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        <label for="name" class="form-label">Name</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                            <input type="text" class="form-control" id="djName" name="name"
+                                                required>
+                                        </div>
+                                        <small class="error-message"></small>
+                                    </div>
+                                    <input type="hidden" id="djDateId" name="date_id">
+                                    <div class="mb-3">
+                                        <label class="form-label">Assigned Date</label>
+                                        <div id="dateGrid" class="date-grid">
+                                            <div class="text-center text-muted py-3">
+                                                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                                                Loading available dates...
+                                            </div>
+                                        </div>
+                                        <small class="error-message"></small>
                                     </div>
                                 </div>
-                                <small class="error-message"></small>
-                            </div>
-                            <div class="mb-3">
-                                <label for="video" class="form-label">Video Preview</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-video"></i></span>
-                                    <input type="file" class="form-control" id="djVideo" name="video"
-                                        accept="video/*" required>
-                                </div>
-                                <div id="uploader" class="mt-2"></div>
-                                <small class="error-message"></small>
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        <label for="video" class="form-label">Video Preview</label>
+                                        <div class="input-group d-none">
+                                            <span class="input-group-text"><i class="fas fa-video"></i></span>
+                                            <input type="file" class="form-control" id="djVideo" name="video"
+                                                accept="video/*">
+                                        </div>
+                                        <div id="uploader" class="mt-2"></div>
+                                        <small class="error-message"></small>
 
-                                <!-- Inline progress UI (hidden until upload starts) -->
-                                <div id="uploadInlineProgress" class="mb-3 d-none">
-                                    <div class="progress">
-                                        <div id="uploadInlineProgressBar" class="progress-bar" role="progressbar"
-                                            style="width: 0%">0%</div>
+                                        <!-- Inline progress UI (hidden until upload starts) -->
+                                        <div id="uploadInlineProgress" class="mb-3 d-none">
+                                            <div class="progress">
+                                                <div id="uploadInlineProgressBar" class="progress-bar" role="progressbar"
+                                                    style="width: 0%">0%</div>
+                                            </div>
+                                            <div id="uploadInlineProgressText" class="text-muted small mt-1">Preparing
+                                                upload...
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div id="uploadInlineProgressText" class="text-muted small mt-1">Preparing upload...
+                                    <div class="mb-3 form-check">
+                                        <input type="checkbox" class="form-check-input" id="djVisible" name="visible"
+                                            value="1" checked>
+                                        <label class="form-check-label" for="djVisible">Show in gallery</label>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="mb-3 form-check">
-                                <input type="checkbox" class="form-check-input" id="djVisible" name="visible" value="1"
-                                    checked>
-                                <label class="form-check-label" for="djVisible">Show in gallery</label>
                             </div>
                         </form>
                     </div>
@@ -197,7 +205,8 @@
                 autoProceed: false,
                 restrictions: {
                     maxFileSize: 1000 * 1024 * 1024,
-                    allowedFileTypes: ['video/*']
+                    allowedFileTypes: ['video/*'],
+                    maxNumberOfFiles: 1
                 }
             });
 
@@ -207,7 +216,19 @@
                 uppy.use(DashboardPlugin, {
                     inline: true,
                     target: '#uploader',
-                    showProgressDetails: true
+                    showProgressDetails: true,
+                    height: 250,
+                    width: '100%',
+                    hideUploadButton: true,
+                    proudlyDisplayPoweredByUppy: false,
+                    showLinkToFileUploadResult: false,
+                    disableStatusBar: true,
+                    hideRetryButton: false,
+                    hidePauseResumeButton: false,
+                    hideCancelButton: false,
+                    doneButtonHandler: null,
+                    fileManagerSelectionType: 'files',
+                    theme: 'light',
                 });
             }
 

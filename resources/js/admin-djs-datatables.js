@@ -41,16 +41,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     orderable: false,
                     searchable: false,
                     render: function (data, type, row) {
-                            if (data || row.hls) {
-                                const poster = row.poster ? `poster="${row.poster}"` : '';
-                                const videoId = `video-${row.id}`;
-                                // If HLS is available prefer HLS playback
-                                if (row.hls) {
-                                    return `<div style="position: relative; width: 100px; height: 75px; border-radius: 4px; overflow: hidden;">
+                        if (data || row.hls) {
+                            const poster = row.poster ? `poster="${row.poster}"` : '';
+                            const videoId = `video-${row.id}`;
+                            // If HLS is available prefer HLS playback
+                            if (row.hls) {
+                                return `<div style="position: relative; width: 100px; height: 75px; border-radius: 4px; overflow: hidden;">
                                         <video id="${videoId}" data-hls="${row.hls}" style="width:100%;height:100%;object-fit:cover;" controls muted playsinline></video>
                                     </div>`;
-                                }
-                                return `<div style="position: relative; width: 100px; height: 75px; border-radius: 4px; overflow: hidden;">
+                            }
+                            return `<div style="position: relative; width: 100px; height: 75px; border-radius: 4px; overflow: hidden;">
                                     <video id="${videoId}" 
                                            style="width: 100%; height: 100%; object-fit: cover;" 
                                            preload="auto"
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                         <source src="${data}" type="video/mp4">
                                     </video>
                                 </div>`;
-                            }
+                        }
                         return '<span class="avatar avatar-sm" style="background-color: var(--tblr-muted-bg);"><i class="fas fa-video text-muted"></i></span>';
                     }
                 },
@@ -347,11 +347,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (xhr.readyState === XMLHttpRequest.DONE) {
                         updateUploadProgress(100);
                         let parsed = {};
-                        try { parsed = JSON.parse(xhr.responseText || '{}'); } catch (e) {}
+                        try { parsed = JSON.parse(xhr.responseText || '{}'); } catch (e) { }
 
                         if (xhr.status >= 200 && xhr.status < 300 && parsed.success) {
                             showToast('Success!', 'DJ saved successfully', 'success');
-                            try { const modal = bootstrap.Modal.getInstance(addOpen); if (modal) modal.hide(); } catch (e) {}
+                            try { const modal = bootstrap.Modal.getInstance(addOpen); if (modal) modal.hide(); } catch (e) { }
                             if (form) form.reset(); if (dateIdInput) dateIdInput.value = ''; document.querySelectorAll('.date-card').forEach(c => c.classList.remove('selected'));
                             djTable.ajax.reload(); fetchAvailableDates();
                         } else {
@@ -361,7 +361,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         hideUploadProgressModal();
                         // reset Uppy
-                        try { window.uppy.reset(); } catch (e) {}
+                        try { window.uppy.reset(); } catch (e) { }
                     }
                 };
 
@@ -560,7 +560,7 @@ document.addEventListener('DOMContentLoaded', () => {
             bar.textContent = percent + '%';
         }
         if (text) {
-            if (percent < 100) text.textContent = `Uploading... ${percent}%`;
+            if (percent < 100) text.textContent = `Uploading...`;
             else text.textContent = `Finalizing...`;
         }
     }
