@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class UploadController extends Controller
 {
@@ -51,7 +52,7 @@ class UploadController extends Controller
         $finalName = $uploadId . '_' . $safeName;
         $finalPath = $publicDir . DIRECTORY_SEPARATOR . $finalName;
 
-        $out = fopen($finalPath, 'ab');
+        $out = fopen($finalPath, 'wb');
 
         for ($i = 1; $i <= $total; $i++) {
             $part = $tmpDir . DIRECTORY_SEPARATOR . "part_{$i}";
@@ -71,6 +72,9 @@ class UploadController extends Controller
         // Return storage-relative path so callers can reference it (e.g. save in DB)
         // This path must be relative to the 'public' disk root (storage/app/public)
         $storageRelative = 'djs/previews/' . $finalName;
+
+        // Log assembled upload for debugging/verification
+        Log::info('Upload assembled', ['upload_id' => $uploadId, 'path' => $storageRelative]);
 
         return response()->json(['path' => $storageRelative]);
     }
