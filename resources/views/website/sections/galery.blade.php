@@ -82,6 +82,7 @@
                     color: #ffffff;
                     font-size: 1rem;
                     text-align: center;
+                    font-weight: 700;
                 }
 
                 .cards-arrow {
@@ -287,7 +288,7 @@
         }
 
         .modal-title.dj-name {
-            font-weight: 600;
+            font-weight: 700;
         }
 
         .btn-outline-light {

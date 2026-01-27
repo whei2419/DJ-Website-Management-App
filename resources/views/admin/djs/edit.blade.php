@@ -37,38 +37,50 @@
                             style="max-width: 100%; height: auto;"></video>
                     </div>
                 @endif
-            @endpush
-            var rem = document.createElement('button'); rem.type='button';
-            rem.className='btn btn-sm btn-outline-danger remove-slot'; rem.textContent='Remove';
-            rem.addEventListener('click', function(){ clone.remove(); });
-            // remove any existing add button
-            var last = clone.querySelector('button'); if (last) last.remove(); clone.appendChild(rem);
-            existing.appendChild(clone);
-            });
-            r.appendChild(addBtn);
-            });
-            });
-            }
+            </div>
 
-            // delegate remove buttons on existing slots
-            existing && existing.addEventListener('click', function(e){ if (e.target &&
-            e.target.classList.contains('remove-slot')){ e.target.closest('.slot-row').remove(); } });
-
-            // on submit gather all slot-row entries (both existingSlots and weekendDatesListEdit if user didn't move)
-            and serialize
-            if (form){
-            form.addEventListener('submit', function(e){
-            var rows = [];
-            var els = document.querySelectorAll('.slot-row');
-            els.forEach(function(r){
-            var date = r.dataset.date;
-            var timeEl = r.querySelector('.slot-time');
-            var time = timeEl ? timeEl.value : '';
-            if (date){ rows.push({date: date, time: time}); }
-            });
-            slotInput.value = rows.length ? JSON.stringify(rows) : '';
-            });
-            }
-            })();
-            </script>
+            <div class="mb-3">
+                <label for="thumbnail" class="form-label">Thumbnail (optional)</label>
+                <input type="file" name="thumbnail" id="thumbnailEdit" accept="image/*" class="form-control">
+                @if ($dj->thumbnail_path)
+                    <div class="mt-2">
+                        <img src="{{ asset('storage/' . $dj->thumbnail_path) }}" alt="Thumbnail"
+                            style="max-width: 200px; height: auto;" />
+                    </div>
+                @endif
+            </div>
         @endpush
+        var rem = document.createElement('button'); rem.type='button';
+        rem.className='btn btn-sm btn-outline-danger remove-slot'; rem.textContent='Remove';
+        rem.addEventListener('click', function(){ clone.remove(); });
+        // remove any existing add button
+        var last = clone.querySelector('button'); if (last) last.remove(); clone.appendChild(rem);
+        existing.appendChild(clone);
+        });
+        r.appendChild(addBtn);
+        });
+        });
+        }
+
+        // delegate remove buttons on existing slots
+        existing && existing.addEventListener('click', function(e){ if (e.target &&
+        e.target.classList.contains('remove-slot')){ e.target.closest('.slot-row').remove(); } });
+
+        // on submit gather all slot-row entries (both existingSlots and weekendDatesListEdit if user didn't move)
+        and serialize
+        if (form){
+        form.addEventListener('submit', function(e){
+        var rows = [];
+        var els = document.querySelectorAll('.slot-row');
+        els.forEach(function(r){
+        var date = r.dataset.date;
+        var timeEl = r.querySelector('.slot-time');
+        var time = timeEl ? timeEl.value : '';
+        if (date){ rows.push({date: date, time: time}); }
+        });
+        slotInput.value = rows.length ? JSON.stringify(rows) : '';
+        });
+        }
+        })();
+        </script>
+    @endpush

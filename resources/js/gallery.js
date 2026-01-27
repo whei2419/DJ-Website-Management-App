@@ -382,43 +382,50 @@ function createDJCard(dj, index) {
         ? `/storage/${dj.preview_video_path}`
         : (dj.video_path ? `/storage/${dj.video_path}` : '');
 
-    const posterSrc = dj.poster_path ? `/storage/${dj.poster_path}` : '';
+    // Prefer generated thumbnail if available, fall back to poster
+    const posterSrc = dj.thumbnail_path ? `/storage/${dj.thumbnail_path}` : (dj.poster_path ? `/storage/${dj.poster_path}` : '');
+
+    // If a poster/thumbnail is available prefer an <img> to avoid loading the full video
+    let mediaHtml = '';
+    if (posterSrc) {
+        mediaHtml = `<img class="dj-video-preview" src="${posterSrc}" data-video-src="${videoSrc}" alt="DJ ${dj.name || ''} preview">`;
+    } else if (videoSrc) {
+        mediaHtml = `<video class="dj-video-preview" src="${videoSrc}" ${posterSrc ? `poster="${posterSrc}"` : ''} muted autoplay loop playsinline preload="metadata"></video>`;
+    } else {
+        mediaHtml = `<div class="dj-video-preview no-media"></div>`;
+    }
 
     card.innerHTML = `
-        <video class="dj-video-preview" src="${videoSrc}" ${posterSrc ? `poster="${posterSrc}"` : ''} muted autoplay loop playsinline preload="metadata"></video>
-        <p class="dj-name">DJ ${dj.name || ''}</p>
+        ${mediaHtml}
+        <p class="dj-name"><strong>DJ ${dj.name || ''}</strong></p>
     `;
 
     // Add click event to open modal
     card.addEventListener('click', () => openDJModal(dj));
 
-    // Add hover effect to play preview (improved load/play handling to reduce glitches)
-    const video = card.querySelector('.dj-video-preview');
-    if (video && videoSrc) {
-        // Prepare video for autoplay on hover: muted, loop, preload metadata
+    // Add hover effect to play preview only when the media element is actually a <video>
+    const mediaEl = card.querySelector('.dj-video-preview');
+    if (mediaEl && mediaEl.tagName && mediaEl.tagName.toLowerCase() === 'video' && videoSrc) {
         try {
-            video.muted = true;
-            video.loop = true;
-            video.playsInline = true;
-            video.preload = 'metadata';
-        } catch (e) {
-            // ignore if properties aren't writable
-        }
+            mediaEl.muted = true;
+            mediaEl.loop = true;
+            mediaEl.playsInline = true;
+            mediaEl.preload = 'metadata';
+        } catch (e) { /* ignore */ }
 
         let playPending = false;
         const tryPlay = () => {
-            if (video.readyState >= 3) { // HAVE_FUTURE_DATA / can play through
-                video.play().catch(err => console.log('Video play failed:', err));
+            if (mediaEl.readyState >= 3) {
+                mediaEl.play().catch(err => console.log('Video play failed:', err));
             } else if (!playPending) {
                 playPending = true;
                 const onCanPlay = () => {
                     playPending = false;
-                    video.play().catch(err => console.log('Video play failed:', err));
-                    video.removeEventListener('canplay', onCanPlay);
+                    mediaEl.play().catch(err => console.log('Video play failed:', err));
+                    mediaEl.removeEventListener('canplay', onCanPlay);
                 };
-                video.addEventListener('canplay', onCanPlay);
-                // Trigger load in case preload didn't start
-                try { video.load(); } catch (e) { /* ignore */ }
+                mediaEl.addEventListener('canplay', onCanPlay);
+                try { mediaEl.load(); } catch (e) { /* ignore */ }
             }
         };
 
@@ -427,8 +434,7 @@ function createDJCard(dj, index) {
         });
 
         card.addEventListener('mouseleave', () => {
-            try { video.pause(); } catch (e) { /* ignore */ }
-            // Do not reset currentTime here to avoid repeated seeking glitches
+            try { mediaEl.pause(); } catch (e) { /* ignore */ }
         });
     }
 

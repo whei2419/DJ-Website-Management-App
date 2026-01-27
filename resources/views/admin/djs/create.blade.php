@@ -29,6 +29,12 @@
                     (FFmpeg required).</div>
             </div>
 
+            <div class="mb-3">
+                <label for="thumbnail" class="form-label">Thumbnail (optional)</label>
+                <input type="file" name="thumbnail" id="thumbnail" accept="image/*" class="form-control">
+                <div class="form-text">Optionally upload a custom thumbnail image (jpg, png, webp).</div>
+            </div>
+
             <input type="hidden" name="date_id" id="djDateId">
             <div class="mb-3">
                 <label class="form-label">Assigned Date</label>

@@ -96,12 +96,17 @@ class DJController extends Controller
                 if ($dj->poster_path && Storage::disk('public')->exists($dj->poster_path)) {
                     $posterUrl = Storage::disk('public')->url($dj->poster_path);
                 }
+                    $thumbnailUrl = null;
+                    if ($dj->thumbnail_path && Storage::disk('public')->exists($dj->thumbnail_path)) {
+                        $thumbnailUrl = Storage::disk('public')->url($dj->thumbnail_path);
+                    }
 
                 return [
                     'id' => $dj->id,
                     'video_preview' => $videoPreview,
                     'hls' => $hlsUrl,
                     'poster' => $posterUrl,
+                    'thumbnail' => $thumbnailUrl,
                     'name' => $dj->name,
                         'date' => $dj->date ? ($dj->date->date instanceof \Illuminate\Support\Carbon ? $dj->date->date->format('M d, Y') : '-') : '-',
                     'date_id' => $dj->date_id,
@@ -150,7 +155,8 @@ class DJController extends Controller
             'slot' => 'nullable|string|max:255',
             'visible' => 'sometimes|boolean',
             'video' => 'nullable|file|mimetypes:video/mp4,video/quicktime,video/x-msvideo,video/x-ms-wmv,video/webm,video/x-matroska|max:512000', // 500MB
-            'video_path' => 'nullable|string'
+            'video_path' => 'nullable|string',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,webp|max:10240'
         ]);
 
         // Require either a file upload or a pre-uploaded video_path (from chunked upload)
@@ -193,6 +199,15 @@ class DJController extends Controller
         } elseif ($request->filled('video_path')) {
             // video already uploaded via chunked upload; client sent storage-relative path
             $data['video_path'] = $request->input('video_path');
+        }
+
+        // Handle optional thumbnail upload (admin may upload custom thumbnail)
+        if ($request->hasFile('thumbnail')) {
+            $thumb = $request->file('thumbnail');
+            $thumbName = 'thumbnail_' . time() . '.' . $thumb->getClientOriginalExtension();
+            $thumbSubdir = 'djs/thumbnails';
+            $thumbPath = $thumb->storeAs($thumbSubdir, $thumbName, 'public');
+            $data['thumbnail_path'] = $thumbPath;
         }
 
         $dj = DJ::create($data);
@@ -309,6 +324,20 @@ class DJController extends Controller
             // Don't generate previews synchronously here; dispatch job after update to avoid timeouts
         }
 
+        // Handle thumbnail upload on update
+        if ($request->hasFile('thumbnail')) {
+            // delete previous thumbnail if exists
+            if ($dj->thumbnail_path && Storage::disk('public')->exists($dj->thumbnail_path)) {
+                Storage::disk('public')->delete($dj->thumbnail_path);
+            }
+
+            $thumb = $request->file('thumbnail');
+            $thumbName = 'thumbnail_' . time() . '.' . $thumb->getClientOriginalExtension();
+            $thumbSubdir = 'djs/thumbnails';
+            $thumbPath = $thumb->storeAs($thumbSubdir, $thumbName, 'public');
+            $data['thumbnail_path'] = $thumbPath;
+        }
+
         if ($request->filled('video_url')) {
             $data['video_url'] = $request->input('video_url');
         }
@@ -342,6 +371,10 @@ class DJController extends Controller
                 // Delete preview files
                 $videoService = new VideoPreviewService();
                 $videoService->deletePreviewFiles($dj->video_path);
+            }
+            // Delete thumbnail if exists
+            if ($dj->thumbnail_path && Storage::disk('public')->exists($dj->thumbnail_path)) {
+                Storage::disk('public')->delete($dj->thumbnail_path);
             }
             
             $dj->delete();

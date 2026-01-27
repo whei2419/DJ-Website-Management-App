@@ -60,6 +60,15 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="mb-3">
+                                        <label for="thumbnail" class="form-label">Thumbnail (optional)</label>
+                                        <input type="file" class="form-control" id="djThumbnail" name="thumbnail"
+                                            accept="image/*">
+                                        <div id="thumbnailPreview" class="mt-2">
+                                            <!-- Thumbnail preview will be inserted here -->
+                                        </div>
+                                        <small class="error-message"></small>
+                                    </div>
                                     <div class="mb-3 form-check">
                                         <input type="checkbox" class="form-check-input" id="djVisible" name="visible"
                                             value="1" checked>
@@ -252,7 +261,7 @@
             const chunkSize = 5 * 1024 * 1024; // 5MB
             const totalChunks = Math.ceil(file.size / chunkSize);
             const uploadId = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() :
-        generateUUID();
+                generateUUID();
 
             for (let i = 0; i < totalChunks; i++) {
                 const start = i * chunkSize;

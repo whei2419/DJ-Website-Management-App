@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const nameInput = document.getElementById('djName');
     // slot field removed from UI/DB; date selection uses `djDateId`
     const videoInput = document.getElementById('djVideo');
+    const thumbnailInput = document.getElementById('djThumbnail');
+    const thumbnailPreview = document.getElementById('thumbnailPreview');
     const saveDJButton = document.getElementById('saveDJButton');
     const DjTitle = document.getElementById('DjTitle');
     const addOpen = document.getElementById('addEditDJModal');
@@ -258,6 +260,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
             if (visibleInput) visibleInput.checked = !!djData.visible;
+            // show thumbnail preview if available
+            if (thumbnailPreview) {
+                thumbnailPreview.innerHTML = '';
+                if (djData.thumbnail) {
+                    const img = document.createElement('img');
+                    img.src = djData.thumbnail;
+                    img.style.maxWidth = '120px';
+                    img.style.height = 'auto';
+                    img.className = 'rounded';
+                    thumbnailPreview.appendChild(img);
+                }
+            }
             // video input left blank for security reasons
         }
     }
@@ -267,6 +281,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const isAdd = true;
         updateModalInfo(isAdd);
     });
+
+    // thumbnail preview on file select
+    if (thumbnailInput) {
+        thumbnailInput.addEventListener('change', function () {
+            if (!thumbnailPreview) return;
+            thumbnailPreview.innerHTML = '';
+            const f = this.files && this.files[0];
+            if (f) {
+                const url = URL.createObjectURL(f);
+                const img = document.createElement('img');
+                img.src = url;
+                img.style.maxWidth = '120px';
+                img.style.height = 'auto';
+                img.className = 'rounded';
+                thumbnailPreview.appendChild(img);
+            }
+        });
+    }
 
     // handle form submission
     saveDJButton.addEventListener('click', async (e) => {
@@ -366,6 +398,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
 
                 xhr.onerror = function () { showToast('Error', 'An error occurred while saving the DJ', 'error'); hideUploadProgressModal(); };
+                // append thumbnail if provided
+                if (thumbnailInput && thumbnailInput.files && thumbnailInput.files.length > 0) {
+                    formData.append('thumbnail', thumbnailInput.files[0]);
+                }
+
                 xhr.send(formData);
             } catch (err) {
                 showToast('Error', err.message || 'Upload failed', 'error');
@@ -450,6 +487,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // append native file if exists
         if (videoInput && videoInput.files && videoInput.files.length > 0) {
             formData.append('video', videoInput.files[0]);
+        }
+        // append thumbnail if provided
+        if (thumbnailInput && thumbnailInput.files && thumbnailInput.files.length > 0) {
+            formData.append('thumbnail', thumbnailInput.files[0]);
         }
 
         xhr.send(formData);
