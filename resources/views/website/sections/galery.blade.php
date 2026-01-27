@@ -250,9 +250,10 @@
     </div>
 
     <!-- Modal for full DJ video -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade gallery-modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content border">
+            <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5 dj-name" id="exampleModalLabel">DJ Performance</h1>
                     <div class="ms-auto d-flex gap-2 align-items-center">
@@ -270,39 +271,4 @@
             </div>
         </div>
     </div>
-
-    <style>
-        /* Glass modal style for gallery */
-        .modal-content {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(10px) saturate(120%);
-            -webkit-backdrop-filter: blur(10px) saturate(120%);
-            color: #fff;
-        }
-
-        .modal-header,
-        .modal-body {
-            background: transparent;
-            border: none;
-        }
-
-        .modal-title.dj-name {
-            font-weight: 700;
-        }
-
-        .btn-outline-light {
-            color: rgba(255, 255, 255, 0.9);
-            border-color: rgba(255, 255, 255, 0.12);
-            background: transparent;
-        }
-
-        .btn-close-white {
-            filter: invert(1) grayscale(1) contrast(200%);
-        }
-
-        .modal-backdrop.show {
-            background-color: rgba(0, 0, 0, 0.55);
-        }
-    </style>
 </div>

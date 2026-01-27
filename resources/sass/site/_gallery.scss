@@ -183,10 +183,6 @@
 
 // Modal styling
 .modal-content {
-    background-color: rgba(0, 0, 0, 0.92);
-    color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.04);
-
     .modal-header {
         background: transparent;
         border-bottom: none;
@@ -240,4 +236,19 @@
 
 .modal .btn-close:active {
     transform: scale(0.96);
+}
+
+.gallery-modal {
+    .modal-dialog {
+        max-width: 900px;
+        margin: 1.75rem auto;
+        background: #0000005b;
+
+        .modal-content {
+            background: #363636b3;
+            border-radius: 8px;
+            overflow: hidden;
+
+        }
+    }
 }

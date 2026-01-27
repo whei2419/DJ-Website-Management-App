@@ -57,6 +57,16 @@ async function loadDates() {
             return { id, date: dateVal, event_name: d.event_name || d.eventName || null, raw: d };
         });
 
+        // Ensure dates are sorted chronologically (oldest -> newest) so "next"/"prev" move forward/backwards in time
+        dates.sort((a, b) => {
+            const da = a.date ? new Date(a.date) : null;
+            const db = b.date ? new Date(b.date) : null;
+            if (da && db) return da - db;
+            if (da && !db) return -1;
+            if (!da && db) return 1;
+            return 0;
+        });
+
         console.log('Loaded dates payload:', dates);
 
         if (dates.length > 0) {
@@ -131,11 +141,13 @@ async function loadDJsForCurrentDate() {
 
     try {
         const identifier = currentDate.id || currentDate.date;
+        console.log('Gallery: loading DJs for identifier:', identifier, 'currentDate object:', currentDate);
         const response = await fetch(`/api/dates/${encodeURIComponent(identifier)}/djs`, { headers: { 'Accept': 'application/json' } });
         if (!response.ok) throw new Error('Failed to fetch DJs: ' + response.status);
 
         const payload = await response.json();
         const djs = Array.isArray(payload) ? payload : (payload.data || payload);
+        console.log('Gallery: DJs payload for', identifier, djs);
         displayDJs(djs);
     } catch (error) {
         console.error('Error loading DJs:', error);
