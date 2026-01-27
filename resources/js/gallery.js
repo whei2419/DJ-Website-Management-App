@@ -161,7 +161,12 @@ function displayDJs(djs) {
 
     if (!galleryContent) return;
 
-    // Clear existing content
+    // Clear existing content and remove any viewport-level messages so they don't overlap cards
+    const viewport = document.querySelector('.carousel-viewport');
+    if (viewport) {
+        const prevMsg = viewport.querySelector('.no-data, .loading-message');
+        if (prevMsg) prevMsg.remove();
+    }
     galleryContent.innerHTML = '';
     currentCardIndex = 0;
 
