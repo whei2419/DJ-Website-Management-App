@@ -10,9 +10,11 @@ let autoAdvanceInterval = null;
 const AUTO_ADVANCE_MS = 4000;
 
 // Initialize gallery on page load
-document.addEventListener('DOMContentLoaded', function () {
-    loadDates();
+document.addEventListener('DOMContentLoaded', async function () {
+    await loadDates();
     setupEventListeners();
+    // If the URL contains a deep-link to a DJ (e.g. /gallery?dj=123&date=2026-01-15), open the modal
+    try { await handleDeepLink(); } catch (e) { /* ignore */ }
 });
 
 // Setup event listeners for navigation arrows
@@ -149,9 +151,37 @@ async function loadDJsForCurrentDate() {
         const djs = Array.isArray(payload) ? payload : (payload.data || payload);
         console.log('Gallery: DJs payload for', identifier, djs);
         displayDJs(djs);
+        return djs;
     } catch (error) {
         console.error('Error loading DJs:', error);
         displayNoDataMessage('Error loading DJ performances');
+        return [];
+    }
+}
+
+// Handle deep-linking to a specific DJ modal from the gallery page
+async function handleDeepLink() {
+    const params = new URLSearchParams(window.location.search);
+    const djId = params.get('dj');
+    const dateParam = params.get('date');
+    if (!djId) return;
+
+    // If a date param is provided, try to select that date first
+    if (dateParam && dates && dates.length) {
+        const idx = dates.findIndex(d => (d.date === dateParam) || String(d.id) === String(dateParam));
+        if (idx >= 0) {
+            currentDateIndex = idx;
+            displayCurrentDate();
+        }
+    }
+
+    // Load DJs for the selected/derived date and open modal for matching DJ id
+    const djs = await loadDJsForCurrentDate();
+    if (!djs || !djs.length) return;
+    const target = djs.find(x => String(x.id) === String(djId));
+    if (target) {
+        // small timeout to ensure UI settled
+        setTimeout(() => openDJModal(target), 120);
     }
 }
 
@@ -508,7 +538,15 @@ function openDJModal(dj) {
     }
 
     // Configure share, copy and download buttons
-    const shareUrl = `${window.location.origin}/videos/${dj.id}`;
+    // Prefer a gallery deep-link so copied links open the modal on the gallery page
+    let dateParam = '';
+    try {
+        if (currentDate && currentDate.date) dateParam = currentDate.date;
+        else if (dj.date_id) dateParam = dj.date_id;
+        else if (dj.date && typeof dj.date === 'string') dateParam = dj.date.split('T')[0];
+    } catch (e) { /* ignore */ }
+
+    const shareUrl = `${window.location.origin}/gallery?dj=${encodeURIComponent(dj.id)}${dateParam ? `&date=${encodeURIComponent(dateParam)}` : ''}`;
 
     // (share button removed from modal — copy link retained)
 
