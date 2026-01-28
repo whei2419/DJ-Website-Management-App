@@ -20,7 +20,7 @@
 <div class="container-fluid section-register">
     <div class="container text-center">
         <p data-aos="fade-up" data-aos-duration="700">
-            YSL BEAUTY INVITES THE NEXT GENERATION OF SOUND-MAKERS TO SEIZE THE BOOTH AND REDEFINE THE ATMOSPHERE​​AT
+            YSL BEAUTY INVITES THE NEXT GENERATION OF SOUND-MAKERS TO SEIZE THE BOOTH AND REDEFINE THE ATMOSPHERE​ ​AT
             THE YSL BEAUTY LIGHT CLUB POP-UP
         </p>
 

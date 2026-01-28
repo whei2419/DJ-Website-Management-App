@@ -84,5 +84,10 @@
         <small data-aos="fade-up" data-aos-duration="800" data-aos-delay="850" data-aos-once="true">*TERMS & CONDITIONS
             APPLY. APPLICABLE FOR REDEMPTION WHILE STOCKS LAST, UPON COMPLETION OF JOURNEY AT THE
             VENUE.</small>
+
+        <div class="mt-4" data-aos="fade-up" data-aos-duration="800" data-aos-delay="900">
+            <a href="https://cloud.news.yslbeauty.com.my/YSL_BEAUTY_LIGHT_CLUB" target="_blank" rel="noopener"
+                class="btn btn-dark-primary">PRE-REGISTER NOW</a>
+        </div>
     </div>
 </div>
