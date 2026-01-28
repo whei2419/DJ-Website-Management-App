@@ -60,7 +60,9 @@
                 <div id="faq-collapse-3" class="accordion-collapse collapse" aria-labelledby="faq-heading-3"
                     data-bs-parent="#faqAccordion">
                     <div class="accordion-body">
-                        <p><strong>STEP 1.</strong> Submit your info HERE. Successful applicants will receive an email
+                        <p><strong>STEP 1.</strong> Submit your info <a style="color: #ffffff;"
+                                href="https://outlook.office.com/book/YSLBEAUTYLIGHTCLUBRISINGBEATS@loreal.onmicrosoft.com/?ismsaljsauthenabled"
+                                target="_blank" rel="noopener">HERE</a>. Successful applicants will receive an email
                             confirmation.</p>
                         <p><strong>STEP 2.</strong> Attend the YSL BEAUTY LIGHT CLUB POP-UP @ The Exchange TRX (G Floor,
                             in front of Concierge), all you have to do is show up!</p>
