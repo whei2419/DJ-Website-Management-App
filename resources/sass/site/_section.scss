@@ -284,6 +284,8 @@
             }
         }
 
+        /* AOS-controlled animations: element-level `data-aos-*` attributes control behavior. */
+
         .white {
             background-color: #ffffff;
             color: #000000;
@@ -324,6 +326,7 @@
                 font-weight: 300;
                 margin-bottom: 12px;
                 line-height: 20px;
+                opacity: 0.8;
             }
         }
 

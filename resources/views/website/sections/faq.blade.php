@@ -16,16 +16,19 @@
                 <div id="faq-collapse-1" class="accordion-collapse collapse" aria-labelledby="faq-heading-1"
                     data-bs-parent="#faqAccordion">
                     <div class="accordion-body">
-                        <p>“YSL Beauty Light Club Rising Beats” is an electrifying platform created by YSL Beauty to
+                        <p>
+                            YSL Beauty Light Club “Rising Beats” is an electrifying platform created by YSL Beauty to
                             celebrate and showcase the freshest DJ talent in the country. Held exclusively at the YSL
                             Beauty Light Club Pop-Up at The Exchange TRX, this initiative breaks down barriers for
                             aspiring DJs whether you’re a seasoned performer or stepping behind the decks for the first
-                            time.</p>
-                        <p>There’s no competition, just pure opportunity: each participant gets to perform their own set
-                            live on stage, with every performance professionally recorded and featured on a dedicated
-                            YSL website.</p>
-                        <p>The goal? To champion local creativity, amplify emerging voices, and transform our pop-up
-                            into a vibrant hub of cutting-edge sound and disruptive elegance.</p>
+                            time.
+                            There’s no competition, just pure opportunity: each participant gets to perform their own
+                            set live on stage, with every performance professionally recorded and featured on a
+                            dedicated YSL website.
+                            The goal? To champion local creativity, amplify emerging voices, and transform our pop-up
+                            into a vibrant hub of cutting-edge sound and disruptive elegance. It’s your moment to shine,
+                            connect, and be part of the next wave of music culture.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -153,7 +156,8 @@
                 <div id="faq-collapse-8" class="accordion-collapse collapse" aria-labelledby="faq-heading-8"
                     data-bs-parent="#faqAccordion">
                     <div class="accordion-body">
-                        <p>At the event, YSL BEAUTY LIGHT CLUB RISING BEATS will provide 2x CDJ3000 and 1x DJM900 Nexus2
+                        <p>At the event, YSL BEAUTY LIGHT CLUB RISING BEATS will provide <strong>2x CDJ3000 and 1x
+                                DJM900 Nexus2</strong>
                             to
                             perform during your 30-minute performance. However, all participants must bring their own DJ
                             accessories (USB pen drives, headphones, DJ software/laptops).</p>
