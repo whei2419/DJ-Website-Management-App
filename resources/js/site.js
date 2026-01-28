@@ -196,3 +196,40 @@ if (document.readyState === 'loading') {
 } else {
 	initGsapScroll();
 }
+
+// Simple client-side tracker that posts lightweight events to the API
+window.trackEvent = async function(eventName, meta = {}){
+	try {
+		await fetch('/api/track-event', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ event: eventName, meta }),
+			credentials: 'same-origin'
+		});
+	} catch (e) {
+		// don't break the site if tracking fails
+		if (typeof console !== 'undefined' && typeof console.debug === 'function') console.debug('trackEvent failed', e);
+	}
+};
+
+// Track page view once when DOM is ready
+if (document.readyState === 'loading') {
+	document.addEventListener('DOMContentLoaded', () => { window.trackEvent('page_view', { path: window.location.pathname }); });
+} else {
+	window.trackEvent('page_view', { path: window.location.pathname });
+}
+
+// Attach listeners for register and gallery button clicks
+function initSiteTracking() {
+	// Register links (booking)
+	document.querySelectorAll('a[href*="outlook.office.com/book"]').forEach(a=>{
+		a.addEventListener('click', ()=> window.trackEvent('register_click', { href: a.href }));
+	});
+
+	// Gallery links
+	document.querySelectorAll('a[href*="/gallery"]').forEach(a=>{
+		a.addEventListener('click', ()=> window.trackEvent('gallery_click', { href: a.href }));
+	});
+}
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initSiteTracking); else initSiteTracking();

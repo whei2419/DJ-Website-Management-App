@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\DJ;
 use App\Models\Date;
 use App\Models\User;
+use App\Models\SiteEvent;
 
 class DashboardController extends Controller
 {
@@ -43,6 +44,15 @@ class DashboardController extends Controller
                 ];
             });
 
-        return view('admin.dashboard', compact('dates', 'totalDJs', 'totalDates', 'recentDJs'));
+        // Site event counts
+        $pageViews = SiteEvent::where('event', 'page_view')->count();
+        $registerClicks = SiteEvent::where('event', 'register_click')->count();
+        $galleryClicks = SiteEvent::where('event', 'gallery_click')->count();
+        $shareCopies = SiteEvent::where('event', 'share_copy')->count();
+
+        return view('admin.dashboard', compact(
+            'dates', 'totalDJs', 'totalDates', 'recentDJs',
+            'pageViews', 'registerClicks', 'galleryClicks', 'shareCopies'
+        ));
     }
 }

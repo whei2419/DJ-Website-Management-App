@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DJController as AdminDJController;
 use App\Http\Controllers\Api\AdminDJController as ApiAdminDJController;
+use App\Http\Controllers\Api\AnalyticsController as AnalyticsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,3 +28,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // Create a new DJ (with optional video upload)
     Route::post('admin/djs', [ApiAdminDJController::class, 'store'])->name('admin.djs.store');
 });
+
+// Public endpoint for lightweight site analytics events
+Route::post('track-event', [AnalyticsController::class, 'store']);

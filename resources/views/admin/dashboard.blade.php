@@ -135,6 +135,46 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-12 mt-3">
+                                <div class="row gx-2">
+                                    <div class="col-md-3 col-6">
+                                        <div class="card">
+                                            <div class="card-body text-center">
+                                                <div class="subheader mb-1">Page Views</div>
+                                                <div class="h2 mb-0">{{ $pageViews ?? 0 }}</div>
+                                                <div class="text-muted mt-1 small">Total page loads</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                        <div class="card">
+                                            <div class="card-body text-center">
+                                                <div class="subheader mb-1">Register Clicks</div>
+                                                <div class="h2 mb-0">{{ $registerClicks ?? 0 }}</div>
+                                                <div class="text-muted mt-1 small">Register button clicks</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-6 mt-2 mt-md-0">
+                                        <div class="card">
+                                            <div class="card-body text-center">
+                                                <div class="subheader mb-1">Gallery Clicks</div>
+                                                <div class="h2 mb-0">{{ $galleryClicks ?? 0 }}</div>
+                                                <div class="text-muted mt-1 small">Gallery button clicks</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-6 mt-2 mt-md-0">
+                                        <div class="card">
+                                            <div class="card-body text-center">
+                                                <div class="subheader mb-1">Share Copies</div>
+                                                <div class="h2 mb-0">{{ $shareCopies ?? 0 }}</div>
+                                                <div class="text-muted mt-1 small">Link copy actions</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="col-6">
                                 <div class="card">
                                     <div class="card-body">

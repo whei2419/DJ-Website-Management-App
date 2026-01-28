@@ -580,6 +580,10 @@ function openDJModal(dj) {
             if (copied) { alert('Link copied to clipboard'); return; }
             window.prompt('Copy this link', shareUrl);
         });
+        // Track copy/share actions
+        freshC.addEventListener('click', () => {
+            try { if (window.trackEvent) window.trackEvent('share_copy', { dj: dj.id, date: dateParam, url: shareUrl }); } catch(e) {}
+        });
     }
 
     // (download button removed from modal)
