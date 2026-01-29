@@ -31,7 +31,7 @@
         <div class="devider" data-aos="fade-up" data-aos-duration="700" data-aos-delay="200"></div>
 
         <p class="px-5" data-aos="fade-up" data-aos-duration="700" data-aos-delay="300">
-            THE EXCHANGE TRX <br>
+            <strong>THE EXCHANGE TRX</strong> <br>
             G FLOOR, INFRONT OF CONCIERGE <br>
             7, 8, 14, 15, 21, 22, 28 FEB & 1 MAR 2026
         </p>s

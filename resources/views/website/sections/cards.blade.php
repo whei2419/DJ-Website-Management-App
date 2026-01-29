@@ -76,7 +76,8 @@
             LIGHT CLUB POP-UP – WHERE LIGHTS, SOUND, AND ICONIC COUTURE BEAUTY TAKE OVER.
             PRE-REGISTER NOW TO REDEEM YOUR EXCLUSIVE GIFT* AT THE VENUE WHEN YOU VISIT.</p>
 
-        <p data-aos="fade-up" data-aos-duration="800" data-aos-delay="750" data-aos-once="true">THE EXCHANGE TRX<br>
+        <p data-aos="fade-up" data-aos-duration="800" data-aos-delay="750" data-aos-once="true"><strong>THE EXCHANGE
+                TRX</strong> <br>
             (G FLOOR, IN FRONT OF CONCIERGE)</p>
 
         <p data-aos="fade-up" data-aos-duration="800" data-aos-delay="800" data-aos-once="true">3 FEB – 1 MAR</p>
