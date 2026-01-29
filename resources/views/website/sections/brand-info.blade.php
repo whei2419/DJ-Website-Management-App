@@ -12,7 +12,7 @@
         </h1>
         <h1 data-aos="fade-down" data-aos-duration="800" data-aos-delay="200">RISING BEATS</h1>
         <p data-aos="fade-up" data-aos-duration="800" data-aos-delay="400">
-            BECOME THE ICON. RISE TO YOUR OWN BEAT.
+            BECOME THE ICON.<br>RISE TO YOUR OWN BEAT.
         </p>
     </div>
 </div>
@@ -31,13 +31,13 @@
         <div class="devider" data-aos="fade-up" data-aos-duration="700" data-aos-delay="200"></div>
 
         <p class="px-5" data-aos="fade-up" data-aos-duration="700" data-aos-delay="300">
-            THE EXCHANGE TRX
-            G FLOOR, INFRONT OF CONCIERGE
+            THE EXCHANGE TRX <br>
+            G FLOOR, INFRONT OF CONCIERGE <br>
             7, 8, 14, 15, 21, 22, 28 FEB & 1 MAR 2026
         </p>s
 
         <p data-aos="fade-up" data-aos-delay="400">
-            THE DECKS ARE WAITING. THE SPOTLIGHT IS YOURS.​​
+            THE DECKS ARE WAITING. <br> THE SPOTLIGHT IS YOURS.​​
         </p>
 
         <div class="button-container" data-aos="fade-up" data-aos-duration="800" data-aos-delay="500">
