@@ -39,34 +39,20 @@ document.addEventListener('DOMContentLoaded', () => {
             columns: [
                 { data: 'id', width: '60px' },
                 {
-                    data: 'video_preview',
+                    data: 'thumbnail',
                     orderable: false,
                     searchable: false,
                     render: function (data, type, row) {
-                        if (data || row.hls) {
-                            const poster = row.poster ? `poster="${row.poster}"` : '';
-                            const videoId = `video-${row.id}`;
-                            // If HLS is available prefer HLS playback
-                            if (row.hls) {
-                                return `<div style="position: relative; width: 100px; height: 75px; border-radius: 4px; overflow: hidden;">
-                                        <video id="${videoId}" data-hls="${row.hls}" style="width:100%;height:100%;object-fit:cover;" controls muted playsinline></video>
-                                    </div>`;
-                            }
+                        // Use thumbnail if available, fall back to poster
+                        const imgSrc = data || row.poster;
+                        if (imgSrc) {
                             return `<div style="position: relative; width: 100px; height: 75px; border-radius: 4px; overflow: hidden;">
-                                    <video id="${videoId}" 
-                                           style="width: 100%; height: 100%; object-fit: cover;" 
-                                           preload="auto"
-                                           ${poster}
-                                           autoplay
-                                           muted 
-                                           loop 
-                                           playsinline>
-                                        <source src="${data}" type="video/webm">
-                                        <source src="${data}" type="video/mp4">
-                                    </video>
+                                    <img src="${imgSrc}" 
+                                         style="width: 100%; height: 100%; object-fit: cover;" 
+                                         alt="${row.name}">
                                 </div>`;
                         }
-                        return '<span class="avatar avatar-sm" style="background-color: var(--tblr-muted-bg);"><i class="fas fa-video text-muted"></i></span>';
+                        return '<span class="avatar avatar-sm" style="background-color: var(--tblr-muted-bg);"><i class="fas fa-image text-muted"></i></span>';
                     }
                 },
                 {

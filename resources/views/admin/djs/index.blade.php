@@ -158,7 +158,7 @@
                                             <thead>
                                                 <tr>
                                                     <th>ID</th>
-                                                    <th>Video Preview</th>
+                                                    <th>Thumbnail</th>
                                                     <th>Name</th>
                                                     <th>Date</th>
                                                     <th>Visible</th>
